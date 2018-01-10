@@ -46,7 +46,7 @@ for i in convoFiles:
 # Var Setup
 VAR_REGISTRY = {}
 def build_registry():
-    global VAR_REGISTRY
+    global VAR_REGISTRY, convo
     VAR_REGISTRY = {
             "user_name": data['user']['name'],
             "name": data['name'],
@@ -60,6 +60,11 @@ def build_registry():
     feelings = json.load(open('feelings.json'))
     for i in feelings:
         VAR_REGISTRY[i['name']] = i['val']
+        # Add diagnostic info
+        convo += [ {
+            "starters": [ i['name'] + " level", "What is your " + i['name'] + "level?"],
+            "replies": [{ "text": "My " + i['name'] + " level is {" + i['name'] + "}." }]
+            }]
 
 build_registry()
 
