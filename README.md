@@ -5,6 +5,5 @@ the [main GitHub](https://github.com/huberf/clara-bot).
 
 ## Setup (With Pip)
 * Run `pip install clara`
-* Setup config.json and an accompanying conversation directory (instructions
-  coming soon).
-* Now import the library via `from clara import brain`, and run the `brain.run()` function to start loop.
+* Create a new directory and enter it such as `mkdir clara`
+* Run `clara` and you can now run `python3 chat.py` to being.

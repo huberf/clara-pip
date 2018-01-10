@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+import json
+import os
+
+# Create chat script
+chat_file = open('chat.py', 'w')
+chat_file.write('from clara import brain\nbrain.run()')
+
+# Create convo file directory
+new_path = os.getcwd() + '/convos/'
+os.makedirs(new_path)
+
+# Create default config file
+config_file = open('config.json', 'w')
+default_config = {
+  "convo_dir": "convos/",
+  "name": "Clara",
+  "food": "spaghetti",
+  "user": {
+    "name": "Default",
+    "hobby": "coding"
+  }
+}
+config_file.write(json.dumps(default_config))
+
+# Setup required emotions
+emotions_file = open('emotions.json', 'w')
+default_emotions = {
+  "happy": 0,
+  "stress": 0,
+  "animosity": 0
+}
+emotions_file.write(json.dumps(default_emotions))
+
+# Setup example feelings file
+feelings_file = open('feelings.json', 'w')
+default_feelings = [
+        { "name": "happiness", "val": 0 },
+        { "name": "hunger", "val": 0 },
+]
+feelings_file.write(json.dumps(default_feelings))
+
+# Setup blank events file for compliance
+events_file = open('events.json', 'w')
+events_file.write('{}')
+
+# Create blank secure log file for private conversation logging
+secure_log = open('secure_log.json', 'w')
+secure_log.write('{}')
