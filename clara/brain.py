@@ -20,6 +20,12 @@ myIO = iograb.ClaraIO()
 configFile = open('config.json')
 raw_data = configFile.read()
 data = json.loads(raw_data)
+null_response = "None"
+try:
+    null_response = data["null_response"]
+except:
+    null_response = "None"
+
 
 # Emotion load
 emotionFile = open('emotions.json')
@@ -234,7 +240,10 @@ def run():
             statement = input_queue[0]
             del input_queue[0]
             response = get_response(statement.lower())
-            myIO.put(response['message'])
+            if not response['message'] == 'None':
+                myIO.put(response['message'])
+            else:
+                myIO.put(null_response)
             secureLogger.log_occurence(response['message'])
             ender = '\n'
             logFile.write('Q: ' + statement + ender)

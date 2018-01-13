@@ -19,7 +19,7 @@ def convert_to_json(raw):
                 try:
                     mods = refined[1].split('.')
                     for z in mods:
-                        parts = mods.split('=')
+                        parts = z.split('=')
                         modifiers += [ {'name': parts[0], 'val': int(parts[1])} ]
                 except:
                     doNothing = True
