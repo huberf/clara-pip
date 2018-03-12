@@ -26,7 +26,6 @@ try:
 except:
     null_response = "None"
 
-
 # Emotion load
 emotionFile = open('emotions.json')
 raw_data = emotionFile.read()
@@ -49,10 +48,20 @@ for i in convoFiles:
         raw_data = convoFile.read()
         convo += convo_reader.convert_to_json(raw_data)
 
+# Setup analysis mode
+analysisConvo = []
+try:
+    analysisFile = open(data['convo_dir'] + 'diagnostics.convo')
+    raw_data = analysisFile.read()
+    analysisConvo += convo_reader.convert_to_json(raw_data)
+except:
+    analysisConvo = []
+
+
 # Var Setup
 VAR_REGISTRY = {}
 def build_registry():
-    global VAR_REGISTRY, convo
+    global VAR_REGISTRY, convo, analysisConvo
     VAR_REGISTRY = {
             "user_name": data['user']['name'],
             "name": data['name'],
@@ -67,10 +76,12 @@ def build_registry():
     for i in feelings:
         VAR_REGISTRY[i['name']] = i['val']
         # Add diagnostic info
-        convo += [ {
+        toAdd = {
             "starters": [ i['name'] + " level", "What is your " + i['name'] + "level?"],
             "replies": [{ "text": "My " + i['name'] + " level is {" + i['name'] + "}." }]
-            }]
+            }
+        convo += [toAdd]
+        analysisConvo += [toAdd]
 
 build_registry()
 
@@ -225,7 +236,11 @@ def event_check():
                 myIO.put(events[i]['response'])
         events[i]['last'] = val
 
+# Runtime flags
+analysisMode = False
+
 def run():
+    global convo, analysisMode
     logFile = open('log.txt', 'a')
     secureLogger = MessageStats("secure_log.json")
     secureLogger.load_log()
@@ -239,7 +254,15 @@ def run():
         if len(input_queue) > 0:
             statement = input_queue[0]
             del input_queue[0]
-            response = get_response(statement.lower())
+            if statement == "Analysis mode":
+                analysisMode = True
+            if not analysisMode:
+                response = get_response(statement.lower())
+            elif analysisMode:
+                backConvo = convo
+                convo = analysisConvo
+                response = get_response(statement.lower())
+                convo = backConvo
             if not response['message'] == 'None':
                 myIO.put(response['message'])
             else:
