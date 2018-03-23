@@ -253,24 +253,19 @@ def event_check():
     VAR_REGISTRY['minute'] = now.minute
     for i in range(len(events)):
         triggers = events[i]['metrics']
-        isActivated = False
+        # Innocent until proven guilty
+        isActivated = True
         for j in range(len(triggers)):
             metric = triggers[j]['metric']
             val = VAR_REGISTRY[metric]
             if triggers[j]['type'] == '$gt':
-                if val > triggers[j]['level'] and triggers[j]['last'] < val:
-                    isActivated = True
-                else:
+                if not (val > triggers[j]['level'] and triggers[j]['last'] < val):
                     isActivated = False
             elif triggers[j]['type'] == '$lt':
-                if val < triggers[j]['level'] and triggers[j]['last'] > val:
-                    isActivated = True
-                else:
+                if not (val < triggers[j]['level'] and triggers[j]['last'] > val):
                     isActivated = False
             elif triggers[j]['type'] == '$eq':
-                if val == triggers[j]['level'] and not triggers[j]['last'] == val:
-                    isActivated = True
-                else:
+                if not (val == triggers[j]['level'] and not triggers[j]['last'] == val):
                     isActivated = False
             events[i]['metrics'][j]['last'] = val
         if isActivated:
