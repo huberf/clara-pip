@@ -14,10 +14,6 @@ from .message_statistics import MessageStats
 from .utils import sentiment
 from .utils import iograb
 
-# Setup global objects
-myIO = iograb.ClaraIO()
-#myIO = iograb.WebIO()
-
 # Config load
 configFile = open('config.json')
 raw_data = configFile.read()
@@ -27,6 +23,15 @@ try:
     null_response = data["null_response"]
 except:
     null_response = "None"
+
+# Setup global objects
+myIO = iograb.ClaraIO()
+try:
+    if data['iomode'] == 'server':
+        myIO = iograb.WebIO()
+except:
+    doNothing = True
+
 
 # Emotion load
 emotionFile = open('emotions.json')
