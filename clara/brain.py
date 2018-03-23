@@ -5,6 +5,8 @@ from os import listdir
 import json
 from threading import Thread
 from time import sleep
+import time
+from datetime import datetime
 import re
 # Import interface for basic convo file
 from .utils import convo_reader
@@ -82,6 +84,11 @@ def build_registry():
             }
         convo += [toAdd]
         analysisConvo += [toAdd]
+    # Finally add the current time to be updated every loop
+    VAR_REGISTRY['timeMilli'] = time.time()
+    now = datetime.now()
+    VAR_REGISTRY['hour'] = now.hour
+    VAR_REGISTRY['minute'] = now.minute
 
 build_registry()
 
@@ -219,22 +226,50 @@ def threaded_input():
 ticker = 0
 events = json.load(open('events.json'))
 for i in range(len(events)):
-    metric = events[i]['metric']
-    val = VAR_REGISTRY[metric]
-    events[i]['last'] = val
+    try:
+        metric = events[i]['metric']
+        val = VAR_REGISTRY[metric]
+        # Make the event support the multievent format
+        events[i]['metrics'] = [events[i]]
+        events[i]['metrics'][0]['last'] = val
+    except:
+        # Multitrigger event
+        metrics = events[i]['metrics']
+        for j in range(len(metrics)):
+            val = VAR_REGISTRY[metrics[j]['metric']]
+            events[i]['metrics'][j]['last'] = val
 def event_check():
     global ticker
     ticker += 1
+    # Update time
+    VAR_REGISTRY['timeMilli'] = time.time()
+    now = datetime.now()
+    VAR_REGISTRY['hour'] = now.hour
+    VAR_REGISTRY['minute'] = now.minute
     for i in range(len(events)):
-        metric = events[i]['metric']
-        val = VAR_REGISTRY[metric]
-        if events[i]['type'] == '$gt':
-            if val > events[i]['level'] and events[i]['last'] < val:
-                myIO.put(events[i]['response'])
-        elif events[i]['type'] == '$lt':
-            if val < events[i]['level'] and events[i]['last'] > val:
-                myIO.put(events[i]['response'])
-        events[i]['last'] = val
+        triggers = events[i]['metrics']
+        isActivated = False
+        for j in range(len(triggers)):
+            metric = triggers[j]['metric']
+            val = VAR_REGISTRY[metric]
+            if triggers[j]['type'] == '$gt':
+                if val > triggers[j]['level'] and triggers[j]['last'] < val:
+                    isActivated = True
+                else:
+                    isActivated = False
+            elif triggers[j]['type'] == '$lt':
+                if val < triggers[j]['level'] and triggers[j]['last'] > val:
+                    isActivated = True
+                else:
+                    isActivated = False
+            elif triggers[j]['type'] == '$eq':
+                if val == triggers[j]['level'] and not triggers[j]['last'] == val:
+                    isActivated = True
+                else:
+                    isActivated = False
+            events[i]['metrics'][j]['last'] = val
+        if isActivated:
+            myIO.put(events[i]['response'])
 
 # Runtime flags
 analysisMode = False
