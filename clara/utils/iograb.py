@@ -50,7 +50,10 @@ class WebIO(ClaraIO):
         return message
 
     def get_response(self):
-        return self.responseQueue.get()
+        if self.responseQueue.empty():
+            return None
+        else:
+            return self.responseQueue.get()
 
     def put(self, text):
         self.responseQueue.put(text)

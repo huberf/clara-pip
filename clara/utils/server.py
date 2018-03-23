@@ -27,7 +27,12 @@ def parse_request():
 
 @app.route("/getresponse", methods=['GET'])
 def handle_retrieval():
-    return handler.get_response()
+    response = handler.get_response()
+    if response == None:
+        return '{"message": "None", "new": "false"}'
+    else:
+        return '{"message": "' + response + '", "new": "true"}'
+
 
 def set_handler(obj):
     global handler
