@@ -14,6 +14,10 @@ from .message_statistics import MessageStats
 from .utils import sentiment
 from .utils import iograb
 
+# Get and instatiate knowledge graph object
+from .knowledge_graph import KnowledgeGraph
+knowledge = KnowledgeGraph()
+
 # Config load
 configFile = open('config.json')
 raw_data = configFile.read()
@@ -94,6 +98,8 @@ def build_registry():
     now = datetime.now()
     VAR_REGISTRY['hour'] = now.hour
     VAR_REGISTRY['minute'] = now.minute
+    # Add all data to knowledge graph
+    knowledge.bulkPut(VAR_REGISTRY)
 
 build_registry()
 
@@ -110,6 +116,7 @@ def handle_modifiers(modifiers):
     for i in modifiers:
         try:
             VAR_REGISTRY[i['name']] += i['val']
+            knowledge.put(i['name'], i['val'])
         except:
             doNothing = True
 
