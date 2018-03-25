@@ -121,7 +121,8 @@ def handle_modifiers(modifiers):
             doNothing = True
 
 def calc_qualifiers(qualifier):
-    registryValue = VAR_REGISTRY[qualifier['name']]
+    #registryValue = VAR_REGISTRY[qualifier['name']]
+    registryValue = knowledge.get(qualifier['name'])
     try:
         if registryValue > qualifier['$gt']:
             return True
@@ -226,7 +227,8 @@ def get_response(input):
             modifiers = i['modifiers']
             min = i['val']
     handle_modifiers(modifiers)
-    toReturn = {'message': response.format(**VAR_REGISTRY), 'image': image}
+    formatValues = knowledge.getRegistry()
+    toReturn = {'message': response.format(**formatValues), 'image': image}
     return toReturn
 
 input_queue = []
@@ -240,7 +242,8 @@ events = json.load(open('events.json'))
 for i in range(len(events)):
     try:
         metric = events[i]['metric']
-        val = VAR_REGISTRY[metric]
+        #val = VAR_REGISTRY[metric]
+        val = knowledge.get(metric)
         # Make the event support the multievent format
         events[i]['metrics'] = [events[i]]
         events[i]['metrics'][0]['last'] = val
@@ -248,23 +251,28 @@ for i in range(len(events)):
         # Multitrigger event
         metrics = events[i]['metrics']
         for j in range(len(metrics)):
-            val = VAR_REGISTRY[metrics[j]['metric']]
+            # val = VAR_REGISTRY[metrics[j]['metric']]
+            val = knowledge.get(metrics[j]['metric'])
             events[i]['metrics'][j]['last'] = val
 def event_check():
     global ticker
     ticker += 1
     # Update time
     VAR_REGISTRY['timeMilli'] = time.time()
+    knowledge.put('timeMilli', time.time());
     now = datetime.now()
     VAR_REGISTRY['hour'] = now.hour
+    knowledge.put('hour', now.hour);
     VAR_REGISTRY['minute'] = now.minute
+    knowledge.put('minute', now.minute)
     for i in range(len(events)):
         triggers = events[i]['metrics']
         # Innocent until proven guilty
         isActivated = True
         for j in range(len(triggers)):
             metric = triggers[j]['metric']
-            val = VAR_REGISTRY[metric]
+            #val = VAR_REGISTRY[metric]
+            val = knowledge.get(metric)
             if triggers[j]['type'] == '$gt':
                 if not (val > triggers[j]['level'] and triggers[j]['last'] < val):
                     isActivated = False
@@ -282,7 +290,7 @@ def event_check():
 analysisMode = False
 
 def run():
-    global convo, analysisMode
+    global convo, analysisMode, knowledge
     logFile = open('log.txt', 'a')
     secureLogger = MessageStats("secure_log.json")
     secureLogger.load_log()
