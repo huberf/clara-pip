@@ -100,6 +100,11 @@ def build_registry():
     VAR_REGISTRY['minute'] = now.minute
     # Add all data to knowledge graph
     knowledge.bulkPut(VAR_REGISTRY)
+    knowledge.addConnection('fulltime', [
+        { 'type': 'connection', 'name': 'hour' },
+        { 'type': 'string', 'text': ':' },
+        { 'type': 'connection', 'name': 'minute' }
+        ])
 
 build_registry()
 

@@ -3,6 +3,7 @@
 
 class KnowledgeGraph:
     registry = {}
+    connections = {}
 
     def __init__(self):
         doNothing = True
@@ -12,7 +13,20 @@ class KnowledgeGraph:
             data = self.registry[key]
             return data
         except:
-            return None
+            try:
+                connection = self.connections[key]
+                response = ""
+                for i in connection:
+                    if i['type'] == 'connection':
+                        response += self.registry[i['name']]
+                    elif i['type'] == 'string':
+                        response += self.registry[i['text']]
+                return response
+            except:
+                return None
+    
+    def addConnection(self, key, fields):
+        self.registry[key] = fields
 
     def put(self, key, value):
         self.registry[key] = value
