@@ -15,7 +15,8 @@ def main():
     return "Personal Clara instance."
 
 @app.route("/converse", methods=['POST'])
-def parse_request():
+@app.route("/api/v1/post/<int:session_id>", methods=['POST'])
+def parse_request(session_id=None):
     try:
         text = json.dumps(request.json)
         message = request.json('input')
@@ -26,7 +27,8 @@ def parse_request():
     return json.dumps({ 'success': True })
 
 @app.route("/getresponse", methods=['GET'])
-def handle_retrieval():
+@app.route("/api/v1/get/<int:session_id>", methods=['GET'])
+def handle_retrieval(session_id=None):
     response = handler.get_response()
     if response == None:
         return '{"message": "None", "new": "false"}'
