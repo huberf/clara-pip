@@ -78,9 +78,9 @@ and the JSON spec is still planned to be the main format for scripted responses.
 
 Clara can be run on a server with requests queued and then retreived.
 To enable server mode add `{"iomode": "server"}` to your `config.json` file.
-* POST `/converse` - Send a JSON object containing the field `input` such as
+* POST `/api/v1/send/<session_id>` - Send a JSON object containing the field `input` such as
   `{"input": "What can you do?"}`.
-* GET `/getresponse` - It returns a JSON object with the fields `new` and
+* GET `/api/v1/get/<session_id>` - It returns a JSON object with the fields `new` and
   `message`. If `new` is `"true"`, this means a new response has been added to the
   queue and the field `message` contains this new message. At this point, this
   message has now been removed from the queue and subsequent calls will retreive

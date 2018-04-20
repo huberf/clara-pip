@@ -49,7 +49,7 @@ class WebIO(ClaraIO):
         '''
         return message
 
-    def get_response(self):
+    def get_response(self, session_id):
         if self.responseQueue.empty():
             return None
         else:
