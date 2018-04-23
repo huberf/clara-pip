@@ -8,6 +8,7 @@ import queue
 
 app = Flask(__name__)
 messageQueue = queue.Queue()
+sessionMessages = {}
 handler = None
 
 @app.route("/")
@@ -23,7 +24,14 @@ def parse_request(session_id=None):
     except:
         message = request.form['input']
     message = message.lower()
-    messageQueue.put(message)
+    if session_id == None:
+        messageQueue.put(message)
+    else:
+        try:
+            sessionMessages[session_id].put(message)
+        except:
+            sessionMessages[session_id] = queue.Queue()
+            sessionMessages[session_id].put(message)
     return json.dumps({ 'success': True })
 
 @app.route("/getresponse", methods=['GET'])

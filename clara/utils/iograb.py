@@ -5,6 +5,7 @@ import queue
 # Local imports
 from .server import app
 from .server import messageQueue
+from .server import sessionMessages
 from .server import set_handler
 
 class ClaraIO:
@@ -18,12 +19,15 @@ class ClaraIO:
 class WebIO(ClaraIO):
     flaskApp = None
     messageQueue = None
+    sessionMessages = None
     responseQueue = queue.Queue()
+    sessionResponses = {}
     def __init__(self):
         ClaraIO.__init__(self)
         #flaskApp = server.app
         self.flaskApp = app
         self.messageQueue = messageQueue
+        self.sessionMessages = sessionMessages
         set_handler(self)
         appThread = Thread(target = self.run)
         appThread.start()
@@ -50,10 +54,20 @@ class WebIO(ClaraIO):
         return message
 
     def get_response(self, session_id):
-        if self.responseQueue.empty():
-            return None
+        if session_id == None:
+            if self.responseQueue.empty():
+                return None
+            else:
+                return self.responseQueue.get()
         else:
-            return self.responseQueue.get()
+            try:
+                if self.responseQueue.empty():
+                    return None
+                else:
+                    return self.responseQueue.get()
+            except:
+                sessionResponses[session_id] = queue.Queue()
+                return None
 
     def put(self, text):
         self.responseQueue.put(text)
