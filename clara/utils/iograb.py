@@ -11,9 +11,9 @@ from .server import set_handler
 class ClaraIO:
     def get(self):
         text = input("> ");
-        return text
+        return { 'text': text, 'session': None }
 
-    def put(self, text):
+    def put(self, text, session_id=None):
         print(text)
 
 class WebIO(ClaraIO):
@@ -53,22 +53,29 @@ class WebIO(ClaraIO):
         '''
         return message
 
-    def get_response(self, session_id):
+    def get_response(self, session_id=None):
         if session_id == None:
             if self.responseQueue.empty():
-                return None
+                return { 'text': None, 'session': None }
             else:
-                return self.responseQueue.get()
+                return { 'text': self.responseQueue.get(), 'session': None }
         else:
             try:
                 if self.responseQueue.empty():
-                    return None
+                    return { 'text': None, 'session': session_id }
                 else:
-                    return self.responseQueue.get()
+                    return { 'text': self.responseQueue.get(), 'session': session_id }
             except:
                 sessionResponses[session_id] = queue.Queue()
-                return None
+                return { 'text': None, 'session': session_id }
 
-    def put(self, text):
-        self.responseQueue.put(text)
+    def put(self, text, session_id=None):
+        if session_id == None:
+            self.responseQueue.put(text)
+        else:
+            try:
+                sessionResponses[session_id] += [text]
+            except:
+                sessionResponses[session_id] = []
+                sessionResponses[session_id] += [text]
         # r.post(postUrl, { 'message': text })

@@ -240,7 +240,8 @@ input_queue = []
 def threaded_input():
     while True:
         if len(input_queue) == 0:
-            input_queue.append(myIO.get());
+            newInput = myIO.get()
+            input_queue.append({ 'text': newInput['text'], 'session': newInput['session'] });
 
 ticker = 0
 events = json.load(open('events.json'))
@@ -307,7 +308,8 @@ def run():
     while not terminated:
         event_check()
         if len(input_queue) > 0:
-            statement = input_queue[0]
+            statement = input_queue[0]['text']
+            session = input_queue[0]['session']
             del input_queue[0]
             if statement == "Analysis mode":
                 analysisMode = True
@@ -319,9 +321,9 @@ def run():
                 response = get_response(statement.lower())
                 convo = backConvo
             if not response['message'] == 'None':
-                myIO.put(response['message'])
+                myIO.put(response['message'], session)
             else:
-                myIO.put(null_response)
+                myIO.put(null_response, session)
             secureLogger.log_occurence(response['message'])
             ender = '\n'
             logFile.write('Q: ' + statement + ender)
