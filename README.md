@@ -34,8 +34,7 @@ Here is an example JSON response file:
       },
       {"text": "Hello world!", "weight": 1, "modifiers": 
         [
-          {"name": "happy_level", "$eq": 2},
-          {"name": "happy_level", "$lt": 2}
+          {"name": "happy_level", "$lte": 2}
         ]
       }
     ]

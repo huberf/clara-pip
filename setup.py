@@ -5,7 +5,7 @@ setup(
   packages = ['clara','clara/utils'],
   package_data={'clara/utils':['*']},
   scripts=['bin/clara'],
-  version = '1.0.8',
+  version = '1.1.0',
   description = 'Conversational chit-chat utility agent',
   author = 'Noah Huber-Feely',
   author_email = 'nhuberfeely@gmail.com',

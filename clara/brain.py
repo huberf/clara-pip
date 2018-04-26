@@ -152,6 +152,22 @@ def calc_qualifiers(qualifier):
     except:
         # Not a less than qualifier
         doNothing = True
+    try:
+        if registryValue <= qualifier['$lte']:
+            return True
+        else:
+            return False
+    except:
+        # Not less than or equal qualifier
+        doNothing = True
+    try:
+        if registryValue >= qualifier['$gte']:
+            return True
+        else:
+            return False
+    except:
+        # Not greater than or equal qualifier
+        doNothing = True
     # Legacy qualifier types
     try:
         if registryValue == qualifier['val']:
