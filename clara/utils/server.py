@@ -5,6 +5,7 @@ from flask import jsonify
 from flask import Flask
 from flask import request
 import queue
+import time
 
 app = Flask(__name__)
 messageQueue = queue.Queue()
@@ -43,6 +44,34 @@ def handle_retrieval(session_id=None):
     else:
         return '{"message": "' + response + '", "new": "true"}'
 
+
+@app.route('/api/v1/io/blocking/<int:session_id>', methods=['POST'])
+def full_retreival(session_id=None):
+    try:
+        text = json.dumps(request.json)
+        message = request.json('input')
+    except:
+        message = request.form['input']
+    message = message.lower()
+    if session_id == None:
+        messageQueue.put(message)
+    else:
+        try:
+            sessionMessages[session_id].put(message)
+        except:
+            sessionMessages[session_id] = queue.Queue()
+            sessionMessages[session_id].put(message)
+    toReturn = ""
+    time.sleep(0.25)
+    toQuit = False
+    while not toQuit:
+        response = handler.get_response(session_id)
+        print(response)
+        if response['text'] == None:
+            toQuit = True
+        else:
+            toReturn += str(response['text']) + '\n'
+    return '{"message": "' + toReturn + '", "new": "true"}'
 
 def set_handler(obj):
     global handler
