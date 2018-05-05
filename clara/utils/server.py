@@ -39,13 +39,14 @@ def parse_request(session_id=None):
 @app.route("/api/v1/get/<int:session_id>", methods=['GET'])
 def handle_retrieval(session_id=None):
     response = handler.get_response(session_id)
-    if response == None:
+    if response['text'] == None:
         return '{"message": "None", "new": "false"}'
     else:
-        return '{"message": "' + response + '", "new": "true"}'
+        return '{"message": "' + response['text'] + '", "new": "true"}'
 
 
 @app.route('/api/v1/io/blocking/<int:session_id>', methods=['POST'])
+@app.route('/api/v1/io/blocking', methods=['POST'])
 def full_retreival(session_id=None):
     try:
         text = json.dumps(request.json)
