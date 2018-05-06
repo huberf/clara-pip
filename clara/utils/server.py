@@ -19,11 +19,13 @@ def main():
 @app.route("/converse", methods=['POST'])
 @app.route("/api/v1/send/<int:session_id>", methods=['POST'])
 def parse_request(session_id=None):
+    print('Session id: ' + str(session_id))
     try:
         text = json.dumps(request.json)
         message = request.json('input')
     except:
         message = request.form['input']
+    print('User message: ' + message)
     message = message.lower()
     if session_id == None:
         messageQueue.put(message)
