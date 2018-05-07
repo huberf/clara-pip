@@ -10,7 +10,7 @@ setup(
   author = 'Noah Huber-Feely',
   author_email = 'nhuberfeely@gmail.com',
   url = 'https://github.com/huberf/clara-pip', # use the URL to the github repo
-  download_url = 'https://github.com/huberf/clara-pip/archive/1.0.8.tar.gz',
+  download_url = 'https://github.com/huberf/clara-pip/archive/1.1.1.tar.gz',
   keywords = ['clara', 'chat'], # arbitrary keywords
   classifiers = [],
 )
