@@ -32,7 +32,12 @@ except:
 myIO = iograb.ClaraIO()
 try:
     if data['iomode'] == 'server':
-        myIO = iograb.WebIO()
+        port = 3000
+        try:
+            port = data['port']
+        except:
+            port = 3000
+        myIO = iograb.WebIO(port)
 except:
     doNothing = True
 

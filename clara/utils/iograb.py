@@ -22,9 +22,11 @@ class WebIO(ClaraIO):
     sessionMessages = None
     responseQueue = queue.Queue()
     sessionResponses = {}
-    def __init__(self):
+    port = 3000
+    def __init__(self, port):
         ClaraIO.__init__(self)
         #flaskApp = server.app
+        self.port = port
         self.flaskApp = app
         self.messageQueue = messageQueue
         self.sessionMessages = sessionMessages
@@ -33,9 +35,8 @@ class WebIO(ClaraIO):
         appThread.start()
 
     def run(self):
-        port = 3000
         # Allow execution on separate thread by removing debug
-        self.flaskApp.run(host='0.0.0.0', port=port, debug=False)
+        self.flaskApp.run(host='0.0.0.0', port=self.port, debug=False)
 
     def get(self):
         messageReceived = False
