@@ -57,7 +57,7 @@ def full_retreival(session_id=None):
         message = request.form['input']
     message = message.lower()
     if session_id == None:
-        messageQueue.put(message)
+        messageQueue.put({ 'text': message, 'session': session_id })
     else:
         try:
             sessionMessages[session_id].put(message)

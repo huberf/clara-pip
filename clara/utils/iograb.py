@@ -40,7 +40,7 @@ class WebIO(ClaraIO):
 
     def get(self):
         messageReceived = False
-        message = ""
+        message = { 'text': '', 'session': None }
         if not messageReceived:
             message = self.messageQueue.get()
             if not message == None:
@@ -52,7 +52,7 @@ class WebIO(ClaraIO):
                 message = contents['message']
                 messageReceived = True
         '''
-        return { 'text': message, 'session': None }
+        return message
 
     def get_response(self, session_id=None):
         if session_id == None:
