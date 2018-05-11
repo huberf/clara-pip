@@ -17,7 +17,7 @@ def main():
     return "Personal Clara instance."
 
 @app.route("/converse", methods=['POST'])
-@app.route("/api/v1/send/<int:session_id>", methods=['POST'])
+@app.route("/api/v1/send/<session_id>", methods=['POST'])
 def parse_request(session_id=None):
     print('Session id: ' + str(session_id))
     try:
@@ -38,7 +38,7 @@ def parse_request(session_id=None):
     return json.dumps({ 'success': True })
 
 @app.route("/getresponse", methods=['GET'])
-@app.route("/api/v1/get/<int:session_id>", methods=['GET'])
+@app.route("/api/v1/get/<session_id>", methods=['GET'])
 def handle_retrieval(session_id=None):
     response = handler.get_response(session_id)
     if response['text'] == None:
@@ -47,7 +47,7 @@ def handle_retrieval(session_id=None):
         return '{"message": "' + response['text'] + '", "new": "true"}'
 
 
-@app.route('/api/v1/io/blocking/<int:session_id>', methods=['POST'])
+@app.route('/api/v1/io/blocking/<session_id>', methods=['POST'])
 @app.route('/api/v1/io/blocking', methods=['POST'])
 def full_retreival(session_id=None):
     try:
@@ -56,14 +56,16 @@ def full_retreival(session_id=None):
     except:
         message = request.form['input']
     message = message.lower()
+    messageQueue.put({ 'text': message, 'session': session_id })
+    '''
     if session_id == None:
-        messageQueue.put({ 'text': message, 'session': session_id })
     else:
         try:
             sessionMessages[session_id].put(message)
         except:
             sessionMessages[session_id] = queue.Queue()
             sessionMessages[session_id].put(message)
+    '''
     toReturn = ""
     time.sleep(0.25)
     toQuit = False
@@ -74,6 +76,8 @@ def full_retreival(session_id=None):
             toQuit = True
         else:
             toReturn += str(response['text']) + '\n'
+    # Remove final newline
+    toReturn = toReturn[:len(toReturn)-1]
     return '{"message": "' + toReturn + '", "new": "true"}'
 
 def set_handler(obj):

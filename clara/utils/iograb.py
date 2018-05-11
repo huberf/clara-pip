@@ -52,6 +52,7 @@ class WebIO(ClaraIO):
                 message = contents['message']
                 messageReceived = True
         '''
+        print(message)
         return message
 
     def get_response(self, session_id=None):
@@ -62,12 +63,16 @@ class WebIO(ClaraIO):
                 return { 'text': self.responseQueue.get(), 'session': None }
         else:
             try:
-                if self.responseQueue.empty():
-                    return { 'text': None, 'session': session_id }
+                if self.sessionResponses[session_id]:
+                    if len(self.sessionResponses[session_id]) > 0:
+                        message = self.sessionResponses[session_id].pop()
+                        print(message)
+                        return { 'text': message, 'session': session_id }
+                    else:
+                        return { 'text': None, 'session': session_id }
                 else:
-                    return { 'text': self.responseQueue.get(), 'session': session_id }
+                    return { 'text': None, 'session': session_id }
             except:
-                sessionResponses[session_id] = queue.Queue()
                 return { 'text': None, 'session': session_id }
 
     def put(self, text, session_id=None):
@@ -75,8 +80,8 @@ class WebIO(ClaraIO):
             self.responseQueue.put(text)
         else:
             try:
-                sessionResponses[session_id] += [text]
+                self.sessionResponses[session_id] += [text]
             except:
-                sessionResponses[session_id] = []
-                sessionResponses[session_id] += [text]
+                self.sessionResponses[session_id] = []
+                self.sessionResponses[session_id] += [text]
         # r.post(postUrl, { 'message': text })
