@@ -78,7 +78,7 @@ def full_retreival(session_id=None):
             toReturn += str(response['text']) + '\n'
     # Remove final newline
     toReturn = toReturn[:len(toReturn)-1]
-    return '{"message": "' + toReturn + '", "new": "true"}'
+    return '{"message": "' + toReturn.replace('\n', '\\n') + '", "new": "true"}'
 
 def set_handler(obj):
     global handler
