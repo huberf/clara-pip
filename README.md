@@ -84,6 +84,10 @@ To enable server mode add `{"iomode": "server"}` to your `config.json` file.
   queue and the field `message` contains this new message. At this point, this
   message has now been removed from the queue and subsequent calls will retreive
   the responses next in line.
+* GET `/api/v1/io/blocking/<session_id>` - Send a JSON object containing the
+  field `input` in the same fashion as the `\send` endpoint and it will return a JSON response
+  identical to the `\get` endpoint with all responses in the queue for the given
+  session.
 
 ## Contributing
 
