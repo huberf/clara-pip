@@ -316,6 +316,13 @@ def event_check():
 # Runtime flags
 analysisMode = False
 
+def master_command(text):
+    global analysisMode
+    if text == 'analysis mode':
+        analysisMode = True
+        return True
+    return False
+
 def run():
     global convo, analysisMode, knowledge
     logFile = open('log.txt', 'a')
@@ -332,8 +339,7 @@ def run():
             statement = input_queue[0]['text']
             session = input_queue[0]['session']
             del input_queue[0]
-            if statement == "Analysis mode":
-                analysisMode = True
+            master_command(statement.lower())
             if not analysisMode:
                 response = get_response(statement.lower())
             elif analysisMode:
