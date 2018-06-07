@@ -3,6 +3,11 @@ from setuptools import setup
 setup(
   name = 'clara',
   packages = ['clara','clara/utils'],
+  install_requires=[
+      'flask',
+      'python-Levenshtein',
+      'vaderSentiment',
+  ],
   package_data={'clara/utils':['*']},
   scripts=['bin/clara'],
   version = '1.1.2',
