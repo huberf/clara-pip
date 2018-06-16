@@ -88,6 +88,11 @@ def build_registry():
             "stress_level": emotions['stress'],
             "animosity": emotions['animosity']
             }
+    count = 0
+    for i in convo:
+        for j in i['starters']:
+            count += 1
+    VAR_REGISTRY['total_response_handles'] = count
     feelings = json.load(open('feelings.json'))
     for i in feelings:
         VAR_REGISTRY[i['name']] = i['val']
