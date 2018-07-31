@@ -48,31 +48,8 @@ raw_data = emotionFile.read()
 emotions = json.loads(raw_data)
 emotionFile.close()
 
-# Append all conversation response around distributed conversation files
-# This allows one to "plug-in" new responses and have them centralized together
-convo = []
-convoDir = data['convo_dir']
-convoFiles = listdir(data['convo_dir'])
-for i in convoFiles:
-    if i.endswith('.json'):
-        convoFile = open(convoDir + i)
-        raw_data = convoFile.read()
-        convo += json.loads(raw_data)
-    elif i.endswith('.convo'):
-        # Process the loose file format
-        convoFile = open(convoDir + i)
-        raw_data = convoFile.read()
-        convo += convo_reader.convert_to_json(raw_data)
-
-# Setup analysis mode
-analysisConvo = []
-try:
-    analysisFile = open(data['convo_dir'] + 'diagnostics.convo')
-    raw_data = analysisFile.read()
-    analysisConvo += convo_reader.convert_to_json(raw_data)
-except:
-    analysisConvo = []
-
+convo = [] # Main array of all possible inputs and responses
+analysisConvo = [] # Main arrow of diagnostic IO
 
 # Var Setup
 VAR_REGISTRY = {}
@@ -116,7 +93,36 @@ def build_registry():
         { 'type': 'connection', 'name': 'minute' }
         ])
 
-build_registry()
+
+# Append all conversation response around distributed conversation files
+# This allows one to "plug-in" new responses and have them centralized together
+def load_convos():
+    global convo
+    convo = [] # Reset convos to prevent duplicates
+    convoDir = data['convo_dir']
+    convoFiles = listdir(data['convo_dir'])
+    for i in convoFiles:
+        if i.endswith('.json'):
+            convoFile = open(convoDir + i)
+            raw_data = convoFile.read()
+            convo += json.loads(raw_data)
+        elif i.endswith('.convo'):
+            # Process the loose file format
+            convoFile = open(convoDir + i)
+            raw_data = convoFile.read()
+            convo += convo_reader.convert_to_json(raw_data)
+    build_registry()
+
+load_convos()
+
+# Setup analysis mode
+try:
+    analysisFile = open(data['convo_dir'] + 'diagnostics.convo')
+    raw_data = analysisFile.read()
+    analysisConvo += convo_reader.convert_to_json(raw_data)
+except:
+    analysisConvo = []
+
 
 def punctuation_stripper(statement):
     toRemove = ['.', '!', '?']
@@ -345,6 +351,10 @@ def run():
             session = input_queue[0]['session']
             del input_queue[0]
             master_command(statement.lower())
+            if statement == 'reload':
+                load_convos()
+                myIO.put('Refreshing convos...', session)
+                continue
             if not analysisMode:
                 response = get_response(statement.lower())
             elif analysisMode:
