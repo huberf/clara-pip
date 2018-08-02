@@ -4,6 +4,9 @@
 class KnowledgeGraph:
     registry = {}
     connections = {}
+    valueToClass = {}
+    classToValue = {}
+
 
     def __init__(self):
         doNothing = True
@@ -24,7 +27,7 @@ class KnowledgeGraph:
                 return response
             except:
                 return None
-    
+
     def addConnection(self, key, fields):
         self.registry[key] = fields
 
@@ -37,3 +40,27 @@ class KnowledgeGraph:
 
     def getRegistry(self):
         return self.registry
+
+    def classify(self, value):
+        return self.valueToClass[value]
+
+    def addClassification(self, value, classification):
+        try:
+            self.valueToClass[value] += [classification]
+        except:
+            self.valueToClass[value] = [classification]
+        try:
+            self.classToValue[classification] += [value]
+        except:
+            self.classToValue[classification] = [value]
+
+    def classMembers(self, classification):
+        return self.classToValue[classification]
+
+if __name__ == '__main__':
+    knowledge = KnowledgeGraph()
+    knowledge.addClassification('The Expanse', 'TV Show')
+    knowledge.addClassification('The Expanse', 'Best Show')
+    print('The Expanse is a ', ', '.join(knowledge.classify('The Expanse')))
+    print('The best shows are', ', '.join(knowledge.classMembers('Best Show')))
+
