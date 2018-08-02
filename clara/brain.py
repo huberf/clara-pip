@@ -48,6 +48,15 @@ raw_data = emotionFile.read()
 emotions = json.loads(raw_data)
 emotionFile.close()
 
+# Knowledge load
+knowledgeFile = open('knowledge.json')
+raw_data = knowledgeFile.read()
+knowledgeData = json.loads(raw_data)
+knowledgeFile.close()
+for i in knowledgeData['classifications']:
+    for j in i['classes']:
+        knowledge.addClassification(i['item'], j)
+
 convo = [] # Main array of all possible inputs and responses
 analysisConvo = [] # Main arrow of diagnostic IO
 
