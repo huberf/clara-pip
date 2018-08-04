@@ -111,15 +111,32 @@ def load_convos():
     convoDir = data['convo_dir']
     convoFiles = listdir(data['convo_dir'])
     for i in convoFiles:
+        convo_json = []
         if i.endswith('.json'):
             convoFile = open(convoDir + i)
             raw_data = convoFile.read()
-            convo += json.loads(raw_data)
+            convo_json = json.loads(raw_data)
         elif i.endswith('.convo'):
             # Process the loose file format
             convoFile = open(convoDir + i)
             raw_data = convoFile.read()
-            convo += convo_reader.convert_to_json(raw_data)
+            convo_json = convo_reader.convert_to_json(raw_data)
+        for i, value in enumerate(convo_json):
+            kill_list = []
+            for j, message in enumerate(value['starters']):
+                # Replacement values
+                search = '%{.*}'
+                found = False
+                for match in re.finditer(search, message):
+                    found = True
+                    string = match.group(0)[2:-1]
+                    for item in knowledge.classMembers(string):
+                        convo_json[i]['starters'] += [message.replace(match.group(0), item)]
+            iters = 0
+            for q in kill_list: # Invariant: q always grows
+                del convo_json[i]['starters'][q - iters]
+                iters += 1
+        convo += convo_json
     build_registry()
 
 load_convos()
