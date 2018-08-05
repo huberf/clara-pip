@@ -58,7 +58,10 @@ class KnowledgeGraph:
             self.classToValue[classification] = [value]
 
     def classMembers(self, classification):
-        return self.classToValue[classification]
+        try:
+            return self.classToValue[classification]
+        except:
+            return []
 
 if __name__ == '__main__':
     knowledge = KnowledgeGraph()
