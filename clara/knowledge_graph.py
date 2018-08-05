@@ -42,7 +42,10 @@ class KnowledgeGraph:
         return self.registry
 
     def classify(self, value):
-        return self.valueToClass[value]
+        try:
+            return self.valueToClass[value]
+        except:
+            return []
 
     def addClassification(self, value, classification):
         try:
