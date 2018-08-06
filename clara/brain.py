@@ -110,6 +110,8 @@ def load_convos():
     convo = [] # Reset convos to prevent duplicates
     convoDir = data['convo_dir']
     convoFiles = listdir(data['convo_dir'])
+    # Replacement values
+    search = re.compile('%{.*}')
     for i in convoFiles:
         convo_json = []
         if i.endswith('.json'):
@@ -124,8 +126,6 @@ def load_convos():
         for i, value in enumerate(convo_json):
             kill_list = []
             for j, message in enumerate(value['starters']):
-                # Replacement values
-                search = '%{.*}'
                 found = False
                 for match in re.finditer(search, message):
                     found = True
