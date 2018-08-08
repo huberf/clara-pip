@@ -28,7 +28,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'create':
         "hobby": "coding"
       }
     }
-    config_file.write(json.dumps(default_config))
+    config_file.write(json.dumps(default_config, indent=2))
 
     # Setup required emotions
     emotions_file = open('emotions.json', 'w')

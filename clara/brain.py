@@ -67,6 +67,8 @@ def load_knowledge():
             raw_data = knowledgeFile.read()
             for j in raw_data.split('\n'):
                 if len(j) > 0:
+                    if j[0] == '#': # Comment line
+                        continue
                     chunks = j.split('|')
                     for q in chunks[1].split(','):
                         knowledge.addClassification(chunks[0], q)
