@@ -49,13 +49,33 @@ emotions = json.loads(raw_data)
 emotionFile.close()
 
 # Knowledge load
-knowledgeFile = open('knowledge.json')
-raw_data = knowledgeFile.read()
-knowledgeData = json.loads(raw_data)
-knowledgeFile.close()
-for i in knowledgeData['classifications']:
-    for j in i['classes']:
-        knowledge.addClassification(i['item'], j)
+def load_knowledge():
+    global knowledge
+    knowledgeDir = data['knowledge_dir']
+    knowledgeFiles = listdir(data['knowledge_dir'])
+    for i in knowledgeFiles:
+        if i.endswith('.json'):
+            knowledgeFile = open(knowledgeDir + i)
+            raw_data = knowledgeFile.read()
+            knowledgeData = json.loads(raw_data)
+            knowledgeFile.close()
+            for q in knowledgeData['classifications']:
+                for j in q['classes']:
+                    knowledge.addClassification(q['item'], j)
+        elif i.endswith('.knowledge'):
+            knowledgeFile = open(knowledgeDir + i)
+            raw_data = knowledgeFile.read()
+            for j in raw_data.split('\n'):
+                if len(j) > 0:
+                    chunks = j.split('|')
+                    for q in chunks[1].split(','):
+                        knowledge.addClassification(chunks[0], q)
+try:
+    load_knowledge()
+except Exception as e:
+    print(e)
+    print('Knowledge load failed. Ensure you have the directory properly configured.')
+
 
 convo = [] # Main array of all possible inputs and responses
 analysisConvo = [] # Main arrow of diagnostic IO
@@ -378,6 +398,7 @@ def run():
             del input_queue[0]
             master_command(statement.lower())
             if statement == 'reload':
+                load_knowledge()
                 load_convos()
                 myIO.put('Refreshing convos...', session)
                 continue
