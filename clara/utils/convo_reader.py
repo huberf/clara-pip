@@ -15,16 +15,21 @@ def convert_to_json(raw):
             for i in actual_data[1].split('; '):
                 data = i.split('|')
                 refined = data[0].split('\\')
-                modifiers = []
+                modifiers = [] # These are things that modify the systems emotions and make changes that would kick off events
+                response_states = [] # These merely gives context to the response and enables one to have conversation flow
                 try:
                     mods = refined[1].split('.')
                     for z in mods:
                         parts = z.split('=')
-                        modifiers += [ {'name': parts[0], 'val': int(parts[1])} ]
+                        if len(parts) == 2:
+                            modifiers += [ {'name': parts[0], 'val': int(parts[1])} ]
+                        elif len(parts) == 1:
+                            response_states += [ { 'name': parts[0] } ]
                 except:
                     doNothing = True
                 to_add = {'text': refined[0], 'weight': 1}
                 to_add['modifiers'] = modifiers
+                to_add['context'] = response_states
                 try:
                     converted = json.loads(data[1])
                     try:
