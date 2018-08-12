@@ -312,6 +312,7 @@ def get_response(input):
             modifiers = i['modifiers']
             min = i['val']
     handle_modifiers(modifiers)
+    knowledge.updateContext()
     formatValues = knowledge.getRegistry()
     toReturn = {'message': response.format(**formatValues), 'image': image}
     return toReturn

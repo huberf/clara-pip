@@ -7,7 +7,6 @@ class KnowledgeGraph:
     valueToClass = {}
     classToValue = {}
 
-
     def __init__(self):
         doNothing = True
 
@@ -62,6 +61,19 @@ class KnowledgeGraph:
             return self.classToValue[classification]
         except:
             return []
+
+    # Specialized context functionality
+    context_graph = {}
+
+    def updateContext(self):
+        for i in context_graph.keys():
+            context_graph[i] += 1 # Move context recency one step into the past
+
+    def newContext(self, value):
+        try:
+            context_graph[value] += 1
+        except:
+            context_graph[value] = 0 # Never seen before
 
 if __name__ == '__main__':
     knowledge = KnowledgeGraph()
