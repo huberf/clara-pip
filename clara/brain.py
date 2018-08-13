@@ -255,6 +255,7 @@ def random_pick_weighted(reply_options):
     return slimmed_reply
 
 def get_response(input):
+    knowledge.updateContext() # Move previous context into the past
     sentimentValues = sentiment.assess(input)
     # Remove currently useless characters
     stripped = punctuation_stripper(input)
@@ -304,15 +305,18 @@ def get_response(input):
     response = 'None'
     image = 'None'
     modifiers = []
+    contexts = []
     # print(possibilities)
     for i in possibilities:
         if i['val'] < min:
             response = i['response']
             image = i['image']
             modifiers = i['modifiers']
+            contexts = i['context']
             min = i['val']
     handle_modifiers(modifiers)
-    knowledge.updateContext()
+    for i in contexts:
+        knowledge.newContext(i)
     formatValues = knowledge.getRegistry()
     toReturn = {'message': response.format(**formatValues), 'image': image}
     return toReturn
