@@ -75,6 +75,15 @@ class KnowledgeGraph:
         except:
             context_graph[value] = 0 # Never seen before
 
+    def contextSeparation(self, name):
+        try:
+            return context_graph[name]
+        except:
+            return float('infinity')
+
+    def dumpContext(self):
+        return context_graph
+
 if __name__ == '__main__':
     knowledge = KnowledgeGraph()
     knowledge.addClassification('The Expanse', 'TV Show')

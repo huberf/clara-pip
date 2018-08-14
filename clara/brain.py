@@ -306,13 +306,21 @@ def get_response(input):
     image = 'None'
     modifiers = []
     contexts = []
+    found_close_context = -1
     # print(possibilities)
     for i in possibilities:
         if i['val'] < min:
-            response = i['response']
-            image = i['image']
-            modifiers = i['modifiers']
-            contexts = i['context']
+            context_this_turn = False
+            for q in contexts:
+                separation = knowledge.contextSeparation(q['name'])
+                if separation == 1: # Happened last cycle
+                    found_close_context = 1
+                    context_this_turn = True
+            if (not found_close_context) or context_this_turn: # If context override close matching
+                response = i['response']
+                image = i['image']
+                modifiers = i['modifiers']
+                contexts = i['context']
             min = i['val']
     handle_modifiers(modifiers)
     for i in contexts:
