@@ -289,6 +289,10 @@ def get_response(input):
                         except:
                             to_add['modifiers'] = []
                         try:
+                            to_add['context'] = b['context']
+                        except:
+                            to_add['context'] = []
+                        try:
                             to_add['weight'] = b['weight']
                         except:
                             to_add['weight'] = 1
@@ -299,7 +303,8 @@ def get_response(input):
                     'response': slimmed_reply['text'],
                     'image': slimmed_reply['image'],
                     'weight': slimmed_reply['weight'],
-                    'modifiers': slimmed_reply['modifiers']
+                    'modifiers': slimmed_reply['modifiers'],
+                    'context': slimmed_reply['context']
                     })
     min = 10000000000
     response = 'None'
@@ -310,21 +315,21 @@ def get_response(input):
     # print(possibilities)
     for i in possibilities:
         if i['val'] < min:
+            contexts = i['context']
             context_this_turn = False
             for q in contexts:
                 separation = knowledge.contextSeparation(q['name'])
                 if separation == 1: # Happened last cycle
                     found_close_context = 1
                     context_this_turn = True
-            if (not found_close_context) or context_this_turn: # If context override close matching
+            if (found_close_context == -1) or context_this_turn: # If context override close matching
                 response = i['response']
                 image = i['image']
                 modifiers = i['modifiers']
-                contexts = i['context']
             min = i['val']
     handle_modifiers(modifiers)
     for i in contexts:
-        knowledge.newContext(i)
+        knowledge.newContext(i['name'])
     formatValues = knowledge.getRegistry()
     toReturn = {'message': response.format(**formatValues), 'image': image}
     return toReturn

@@ -66,23 +66,23 @@ class KnowledgeGraph:
     context_graph = {}
 
     def updateContext(self):
-        for i in context_graph.keys():
-            context_graph[i] += 1 # Move context recency one step into the past
+        for i in self.context_graph.keys():
+            self.context_graph[i] += 1 # Move context recency one step into the past
 
     def newContext(self, value):
         try:
-            context_graph[value] += 1
+            self.context_graph[value] += 1
         except:
-            context_graph[value] = 0 # Never seen before
+            self.context_graph[value] = 0 # Never seen before
 
     def contextSeparation(self, name):
         try:
-            return context_graph[name]
+            return self.context_graph[name]
         except:
             return float('infinity')
 
     def dumpContext(self):
-        return context_graph
+        return self.context_graph
 
 if __name__ == '__main__':
     knowledge = KnowledgeGraph()
