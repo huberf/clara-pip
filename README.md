@@ -89,6 +89,25 @@ Q: I have to go now. Bye!
 As this is still in development, the format will continue to update and morph,
 and the JSON spec is still planned to be the main format for scripted responses.
 
+## Modifiers and Context in Convo Files
+After a single reply option (which are separated by the `;` character), one can
+use a `\` to signify the inclusion of modifiers and context which are then
+separated by the `.` character. For example,
+`This is an example reply.\exampleContext.useful=3; Why should I give an example
+reply.\useful=-2.aggravatedResponse`
+Modifiers can then be used when qualifying responses (such as only reply
+with `I'm glad I could help` if `useful>1`.
+
+#### Context Logic
+If a response is selected with a given context this context is saved in a
+recency hash table. If the next thing a user types includes another response
+with the exact same context as a context in the last response, that response
+will be selected. This provides continuity. For example if one context for the
+response `Type in ABC Publishing to your favorite GPS app` is
+`askingForDirections`, and the user then says `What do you mean?` you could then
+have a follow up response with the assigned context of `askingForDirections` and
+provide a more detailed reply.
+
 ## Knowledge Files
 Knowledge allows the Clara system to connect words or phrases with classes of
 information. For example, `Hello, Hey, Hi` are all `Greetings` so with the new
