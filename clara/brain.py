@@ -48,6 +48,16 @@ raw_data = emotionFile.read()
 emotions = json.loads(raw_data)
 emotionFile.close()
 
+# Context load
+try:
+    contextFile = open('context.json')
+    raw_data = contextFile.read()
+    context = json.loads(raw_data)
+    knowledge.loadContext(context)
+    contextFile.close()
+except:
+    pass # Context file setup is not required
+
 # Knowledge load
 def load_knowledge():
     global knowledge
@@ -441,8 +451,14 @@ def run():
             else:
                 logFile.write('R: None' + ender)
             if statement == "quit":
+                print('Shutting down...')
                 terminated = True
         sleep(0.1)
+    # Save context
+    contextFile = open('context.json', 'w')
+    contextFile.write(json.dumps(knowledge.dumpContext()))
+    contextFile.close()
+    # Save emotions
     emotionFile = open('emotions.json', 'w')
     emotionFile.write(json.dumps(emotions))
     emotionFile.close()

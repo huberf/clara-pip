@@ -71,7 +71,7 @@ class KnowledgeGraph:
 
     def newContext(self, value):
         try:
-            self.context_graph[value] += 1
+            self.context_graph[value] = 0
         except:
             self.context_graph[value] = 0 # Never seen before
 
@@ -80,6 +80,9 @@ class KnowledgeGraph:
             return self.context_graph[name]
         except:
             return float('infinity')
+
+    def loadContext(self, context_map):
+        self.context_graph = context_map
 
     def dumpContext(self):
         return self.context_graph
