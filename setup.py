@@ -10,12 +10,12 @@ setup(
   ],
   package_data={'clara/utils':['*']},
   scripts=['bin/clara'],
-  version = '1.2.2',
+  version = '1.3.0',
   description = 'Conversational chit-chat utility agent',
   author = 'Noah Huber-Feely',
   author_email = 'nhuberfeely@gmail.com',
   url = 'https://github.com/huberf/clara-pip', # use the URL to the github repo
-  download_url = 'https://github.com/huberf/clara-pip/archive/1.2.2.tar.gz',
+  download_url = 'https://github.com/huberf/clara-pip/archive/1.3.0.tar.gz',
   keywords = ['clara', 'chat'], # arbitrary keywords
   classifiers = [],
 )
