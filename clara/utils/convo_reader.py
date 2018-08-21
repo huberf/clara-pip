@@ -24,7 +24,12 @@ def convert_to_json(raw):
                         if len(parts) == 2:
                             modifiers += [ {'name': parts[0], 'val': int(parts[1])} ]
                         elif len(parts) == 1:
-                            response_states += [ { 'name': parts[0] } ]
+                            starting = False
+                            name = parts[0]
+                            if parts[0][0] == '^':
+                                starting = True
+                                name = parts[0][1:]
+                            response_states += [ { 'name': name, 'starting': starting} ]
                 except:
                     doNothing = True
                 to_add = {'text': refined[0], 'weight': 1}

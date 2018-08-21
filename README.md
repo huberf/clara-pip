@@ -93,8 +93,11 @@ and the JSON spec is still planned to be the main format for scripted responses.
 After a single reply option (which are separated by the `;` character), one can
 use a `\` to signify the inclusion of modifiers and context which are then
 separated by the `.` character. For example,
-`This is an example reply.\exampleContext.useful=3; Why should I give an example
+`This is an example reply.\^exampleContext.useful=3; Why should I give an example
 reply.\useful=-2.aggravatedResponse`
+To start off a context you must place the `^` symbol before the context name
+otherwise that context won't be added to the recency (unless the response is
+following the context of another one).
 Modifiers can then be used when qualifying responses (such as only reply
 with `I'm glad I could help` if `useful>1`.
 

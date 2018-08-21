@@ -256,6 +256,20 @@ def calc_qualifiers(qualifier):
 
 # Pick a random option from supplied reply list using weights
 def random_pick_weighted(reply_options):
+    for i in reply_options:
+        try:
+            relevant = False
+            for j in i['context']:
+                if knowledge.contextSeparation(j['name']) == 1 or j['starting'] == True:
+                    relevant = True
+                    if knowledge.contextSeparation(j['name']) == 1:
+                        return i # Prevent this reply from failing to be sent despite being applicable
+            if len(i['context']) == 0:
+                relevant = True
+            if not relevant:
+                reply_options.remove(i)
+        except:
+            pass # Don't remove
     weights = list(map(lambda e: e['weight'], reply_options))
     indexes = list(range(0, len(reply_options)))
     # Generates a list with a single entry containing a value randomly picked with proper weight
@@ -323,13 +337,14 @@ def get_response(input):
     contexts = []
     found_close_context = -1
     # print(possibilities)
+    CONTEXT_THRESHOLD = 1 # Steps away a context is still relevant
     for i in possibilities:
         if i['val'] < min:
             contexts = i['context']
             context_this_turn = False
             for q in contexts:
                 separation = knowledge.contextSeparation(q['name'])
-                if separation == 1: # Happened last cycle
+                if separation == CONTEXT_THRESHOLD:
                     found_close_context = 1
                     context_this_turn = True
             if (found_close_context == -1) or context_this_turn: # If context override close matching
@@ -339,7 +354,9 @@ def get_response(input):
             min = i['val']
     handle_modifiers(modifiers)
     for i in contexts:
-        knowledge.newContext(i['name'])
+        # If kicking off or continuing the train
+        if i['starting'] == True or knowledge.contextSeparation(i['name']) == CONTEXT_THRESHOLD:
+            knowledge.newContext(i['name'])
     formatValues = knowledge.getRegistry()
     toReturn = {'message': response.format(**formatValues), 'image': image}
     return toReturn
