@@ -256,13 +256,17 @@ def calc_qualifiers(qualifier):
 
 # Pick a random option from supplied reply list using weights
 def random_pick_weighted(reply_options):
+    context_responses = []
+    relevant_context = False
     for i in reply_options:
         try:
             relevant = False
             for j in i['context']:
                 if knowledge.contextSeparation(j['name']) == 1 or j['starting'] == True:
                     relevant = True
-                    if knowledge.contextSeparation(j['name']) == 1:
+                    if not j['name'] == 'general' and knowledge.contextSeparation(j['name']) == 1:
+                        relevant_context = True
+                        context_responses += [i]
                         return i # Prevent this reply from failing to be sent despite being applicable
             if len(i['context']) == 0:
                 relevant = True
@@ -270,6 +274,8 @@ def random_pick_weighted(reply_options):
                 reply_options.remove(i)
         except:
             pass # Don't remove
+    if relevant_context:
+        reply_options = context_responses # Overwrite with narrowed responses
     weights = list(map(lambda e: e['weight'], reply_options))
     indexes = list(range(0, len(reply_options)))
     # Generates a list with a single entry containing a value randomly picked with proper weight
@@ -353,10 +359,12 @@ def get_response(input):
                 modifiers = i['modifiers']
             min = i['val']
     handle_modifiers(modifiers)
+    # Update context waiting
     for i in contexts:
         # If kicking off or continuing the train
         if i['starting'] == True or knowledge.contextSeparation(i['name']) == CONTEXT_THRESHOLD:
             knowledge.newContext(i['name'])
+    knowledge.newContext('general') # This is a persistent context that enables something to always be selected
     formatValues = knowledge.getRegistry()
     toReturn = {'message': response.format(**formatValues), 'image': image}
     return toReturn

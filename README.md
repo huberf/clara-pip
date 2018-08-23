@@ -101,6 +101,11 @@ following the context of another one).
 Modifiers can then be used when qualifying responses (such as only reply
 with `I'm glad I could help` if `useful>1`.
 
+Note: The context `general` is always relevant so can be included to enable a
+response to be used for everything including when no relevant contexts otherwise
+exist.
+
+
 #### Context Logic
 If a response is selected with a given context this context is saved in a
 recency hash table. If the next thing a user types includes another response
