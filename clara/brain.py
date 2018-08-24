@@ -412,15 +412,20 @@ def event_check():
             metric = triggers[j]['metric']
             #val = VAR_REGISTRY[metric]
             val = knowledge.get(metric)
-            if triggers[j]['type'] == '$gt':
-                if not (val > triggers[j]['level'] and triggers[j]['last'] < val):
-                    isActivated = False
-            elif triggers[j]['type'] == '$lt':
-                if not (val < triggers[j]['level'] and triggers[j]['last'] > val):
-                    isActivated = False
-            elif triggers[j]['type'] == '$eq':
-                if not (val == triggers[j]['level'] and not triggers[j]['last'] == val):
-                    isActivated = False
+            if val == None:
+                val = knowledge.contextSeparation(metric)
+            if triggers[j]['last']:
+                if triggers[j]['type'] == '$gt':
+                    if not (val > triggers[j]['level'] and triggers[j]['last'] < val):
+                        isActivated = False
+                elif triggers[j]['type'] == '$lt':
+                    if not (val < triggers[j]['level'] and triggers[j]['last'] > val):
+                        isActivated = False
+                elif triggers[j]['type'] == '$eq':
+                    if not (val == triggers[j]['level'] and not triggers[j]['last'] == val):
+                        isActivated = False
+            else:
+                isActivated = False
             events[i]['metrics'][j]['last'] = val
         if isActivated:
             myIO.put(events[i]['response'])
