@@ -279,6 +279,8 @@ def random_pick_weighted(reply_options):
     weights = list(map(lambda e: e['weight'], reply_options))
     indexes = list(range(0, len(reply_options)))
     # Generates a list with a single entry containing a value randomly picked with proper weight
+    if (len(indexes) == 0):
+        return -1
     choices_list = random.choices(indexes, weights=weights, k=1)
     picked_index = choices_list[0]
     slimmed_reply = reply_options[picked_index]
@@ -328,6 +330,8 @@ def get_response(input):
                             to_add['weight'] = 1
                         reply_options += [to_add]
                 slimmed_reply = random_pick_weighted(reply_options)
+                if slimmed_reply == -1:
+                    return { 'message': 'None' }
                 possibilities.append({
                     'val': val,
                     'response': slimmed_reply['text'],
