@@ -99,6 +99,7 @@ def build_registry():
     VAR_REGISTRY = {
             "user_name": data['user']['name'],
             "name": data['name'],
+            "age": data['age'],
             "response_count": len(convo),
             "user_hobby": data['user']['hobby'],
             "favorite_food": data['food'],
