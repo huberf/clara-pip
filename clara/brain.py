@@ -99,14 +99,20 @@ def build_registry():
     VAR_REGISTRY = {
             "user_name": data['user']['name'],
             "name": data['name'],
-            "age": data['age'],
             "response_count": len(convo),
             "user_hobby": data['user']['hobby'],
-            "favorite_food": data['food'],
             "happy_level": emotions['happy'],
             "stress_level": emotions['stress'],
             "animosity": emotions['animosity']
             }
+    try:
+        VAR_REGISTRY['age'] = data['age']
+    except:
+        do_nothing = True
+    try:
+        VAR_REGISTRY['favorite_food'] = data['food']
+    except:
+        do_nothing = True
     count = 0
     for i in convo:
         for j in i['starters']:
