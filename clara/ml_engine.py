@@ -48,4 +48,12 @@ def cache_tokens():
             temp = tokenize(j)
             for q in temp:
                 all_roots[q] = 0 # dummy value
-    print(all_roots)
+    # Now we generate an index for every node
+    roots = list(all_roots.keys())
+    save_map = {}
+    for i in range(len(roots)):
+        save_map[roots[i]] = i
+    string = json.dumps({ 'count': len(roots), 'roots': save_map })
+    cache_file = open('root_cache.json', 'w')
+    cache_file.write(string)
+
