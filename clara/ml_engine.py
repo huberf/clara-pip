@@ -66,3 +66,18 @@ def load_cache():
     cache_file = open('root_cache.json', 'r')
     contents = cache_file.read()
     ROOT_CACHE = json.loads(contents)
+
+def string_to_root_array(string):
+    if ROOT_CACHE == None:
+        load_cache()
+    tokens = tokenize(string)
+    to_return = []
+    for i in range(ROOT_CACHE['count']):
+        to_return += [0]
+    for i in tokens:
+        try:
+            index = ROOT_CACHE['roots'][i]
+            to_return[index] = 1
+        except:
+            print("Root is not in collection:", i)
+    return to_return
