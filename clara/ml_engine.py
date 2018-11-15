@@ -17,6 +17,8 @@ configFile = open('config.json')
 raw_data = configFile.read()
 data = json.loads(raw_data)
 
+ROOT_CACHE = None
+
 def tokenize(string):
     ignore_words = []
     words = string.split(' ')
@@ -24,6 +26,7 @@ def tokenize(string):
     return words
 
 def cache_tokens():
+    global ROOT_CACHE
     # Load all conversations
     convo = []
     convoFiles = listdir(data['convo_dir'])
@@ -53,7 +56,13 @@ def cache_tokens():
     save_map = {}
     for i in range(len(roots)):
         save_map[roots[i]] = i
-    string = json.dumps({ 'count': len(roots), 'roots': save_map })
+    ROOT_CACHE = { 'count': len(roots), 'roots': save_map }
+    string = json.dumps(ROOT_CACHE)
     cache_file = open('root_cache.json', 'w')
     cache_file.write(string)
 
+def load_cache():
+    global ROOT_CACHE
+    cache_file = open('root_cache.json', 'r')
+    contents = cache_file.read()
+    ROOT_CACHE = json.loads(contents)
