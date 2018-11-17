@@ -12,6 +12,12 @@ import nltk
 from nltk.stem.lancaster import LancasterStemmer
 stemmer = LancasterStemmer()
 
+# things we need for Tensorflow
+import numpy as np
+import tflearn
+import tensorflow as tf
+import random
+
 # Config load
 configFile = open('config.json')
 raw_data = configFile.read()
@@ -42,8 +48,10 @@ def cache_tokens():
             convo += convo_reader.convert_to_json(raw_data)
     # Now get all contexts and tokens
     all_roots = {}
+    all_replies = {}
     for i in convo:
         for j in i['replies']:
+            all_replies[json.dumps(j)] = 0 # Make JSON representations of replies
             temp = tokenize(j['text'])
             for q in temp:
                 all_roots[q] = 0 # dummy value
@@ -56,7 +64,11 @@ def cache_tokens():
     save_map = {}
     for i in range(len(roots)):
         save_map[roots[i]] = i
-    ROOT_CACHE = { 'count': len(roots), 'roots': save_map }
+    replies = list(all_replies.keys())
+    reply_map = {}
+    for i in range(len(replies)):
+        reply_map[replies[i]] = i
+    ROOT_CACHE = { 'count': len(roots), 'roots': save_map, 'replies': reply_map }
     string = json.dumps(ROOT_CACHE)
     cache_file = open('root_cache.json', 'w')
     cache_file.write(string)
