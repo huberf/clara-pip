@@ -93,3 +93,33 @@ def string_to_root_array(string):
         except:
             print("Root is not in collection:", i)
     return to_return
+
+def build_model():
+    # reset underlying graph data
+    tf.reset_default_graph()
+    # Build neural network
+    net = tflearn.input_data(shape=[None, len(list(ROOT_CACHE['roots'].keys()))])
+    net = tflearn.fully_connected(net, 8) # First hidden layer
+    net = tflearn.fully_connected(net, 8) # Second hidden layer
+    net = tflearn.fully_connected(net, len(list(ROOT_CACHE['replies'].keys())), activation='softmax')
+    net = tflearn.regression(net)
+
+    # Define model and setup tensorboard
+    model = tflearn.DNN(net, tensorboard_dir='tflearn_logs')
+    return model
+
+def train_model(model, epochs):
+    train_x = [] # TODO: Setup examples
+    train_y = [] # TODO: Setup examples
+    model.fit(train_x, train_y, n_epoch=epochs, batch_size=8, show_metric=True)
+
+if __name__ == '__main__':
+    print("Caching tokens...")
+    cache_tokens()
+    #load_cache()
+    print("Building model...")
+    model = build_model()
+    #train_model(model, 100)
+    tokens = string_to_root_array("What are you up to?")
+    print(tokens)
+    print(model.predict([tokens]))
