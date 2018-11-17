@@ -24,6 +24,12 @@ This is an early version, and has only recently graduated from being a fun exper
 6. This is messy so pulling from the pip setup is recommended for any use case
    not requiring customizing the package code.
 
+
+## Development/Contribution Tips
+
+The best place to dive in is `clara/brain.py` which is what calls all other modules
+and shows the core logic.
+
 ## Convo File Formats
 All json files from the `convos/` directory are automatically loaded at startup.
 Therefore, you can break your convo files into an infinite number of individual
