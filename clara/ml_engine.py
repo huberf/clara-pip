@@ -31,8 +31,7 @@ def tokenize(string):
     words = [stemmer.stem(w.lower()) for w in words if w not in ignore_words]
     return words
 
-def cache_tokens():
-    global ROOT_CACHE
+def _load_convos():
     # Load all conversations
     convo = []
     convoFiles = listdir(data['convo_dir'])
@@ -46,12 +45,17 @@ def cache_tokens():
             convoFile = open('convos/' + i)
             raw_data = convoFile.read()
             convo += convo_reader.convert_to_json(raw_data)
+    return convo
+
+def cache_tokens():
+    global ROOT_CACHE
+    convo = _load_convos()
     # Now get all contexts and tokens
     all_roots = {}
     all_replies = {}
     for i in convo:
+        all_replies[json.dumps(i['replies'])] = 0 # Make JSON representations of replies
         for j in i['replies']:
-            all_replies[json.dumps(j)] = 0 # Make JSON representations of replies
             temp = tokenize(j['text'])
             for q in temp:
                 all_roots[q] = 0 # dummy value
@@ -111,6 +115,19 @@ def build_model():
 def train_model(model, epochs):
     train_x = [] # TODO: Setup examples
     train_y = [] # TODO: Setup examples
+    convo = _load_convos()
+    for i in convo:
+        reply_match = json.dumps(i['replies']) # Make JSON representations of replies
+        for j in i['starters']:
+            train_x += [ string_to_root_array(j) ] # Convert to model input
+            y_in = []
+            # Convert to reply to vector with only applicable reply equal to 1
+            for q in range(len(list(ROOT_CACHE['replies'].keys()))):
+                if q == ROOT_CACHE['replies'][reply_match]:
+                    y_in += [1]
+                else:
+                    y_in += [0]
+            train_y += [ y_in ]
     model.fit(train_x, train_y, n_epoch=epochs, batch_size=8, show_metric=True)
 
 if __name__ == '__main__':
@@ -119,7 +136,12 @@ if __name__ == '__main__':
     #load_cache()
     print("Building model...")
     model = build_model()
-    #train_model(model, 100)
+    print("Training model...")
+    train_model(model, 100)
+    print("Testing model...")
     tokens = string_to_root_array("What are you up to?")
+    print(tokens)
+    print(model.predict([tokens]))
+    tokens = string_to_root_array("What is the convo file type?")
     print(tokens)
     print(model.predict([tokens]))
