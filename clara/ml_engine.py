@@ -28,7 +28,7 @@ ROOT_CACHE = None
 def tokenize(string):
     ignore_words = []
     words = string.split(' ')
-    words = [stemmer.stem(w.lower()) for w in words if w not in ignore_words]
+    words = [stemmer.stem(w.lower().strip('.').strip('?').strip('!')) for w in words if w not in ignore_words]
     return words
 
 def _load_convos():
@@ -103,8 +103,9 @@ def build_model():
     tf.reset_default_graph()
     # Build neural network
     net = tflearn.input_data(shape=[None, len(list(ROOT_CACHE['roots'].keys()))])
-    net = tflearn.fully_connected(net, 8) # First hidden layer
-    net = tflearn.fully_connected(net, 8) # Second hidden layer
+    node_count = 16
+    net = tflearn.fully_connected(net, node_count) # First hidden layer
+    net = tflearn.fully_connected(net, node_count) # Second hidden layer
     net = tflearn.fully_connected(net, len(list(ROOT_CACHE['replies'].keys())), activation='softmax')
     net = tflearn.regression(net)
 
@@ -128,7 +129,20 @@ def train_model(model, epochs):
                 else:
                     y_in += [0]
             train_y += [ y_in ]
-    model.fit(train_x, train_y, n_epoch=epochs, batch_size=8, show_metric=True)
+    f = open('dev_logs/train.log', 'w')
+    f.write(json.dumps(train_x))
+    f.write('\n')
+    f.write(json.dumps(train_y))
+    model.fit(train_x, train_y, n_epoch=epochs, batch_size=10, show_metric=True)
+
+def out_to_reply(out):
+    max_i = 0
+    max_val = out[0]
+    for i in range(1,len(out)):
+        if out[i] > max_val:
+            max_val = out[i]
+            max_i = i
+    return list(ROOT_CACHE['replies'].keys())[max_i]
 
 if __name__ == '__main__':
     print("Caching tokens...")
@@ -137,11 +151,20 @@ if __name__ == '__main__':
     print("Building model...")
     model = build_model()
     print("Training model...")
-    train_model(model, 100)
+    train_model(model, 200)
     print("Testing model...")
     tokens = string_to_root_array("What are you up to?")
-    print(tokens)
-    print(model.predict([tokens]))
+    out = list(model.predict([tokens]))
+    print(out)
+    print(out_to_reply(out[0]))
     tokens = string_to_root_array("What is the convo file type?")
-    print(tokens)
-    print(model.predict([tokens]))
+    out = list(model.predict([tokens]))
+    print(out)
+    print(out_to_reply(out[0]))
+    print("Ready for input...")
+    while True:
+        text = input("> ")
+        tokens = string_to_root_array(text)
+        out = list(model.predict([tokens]))
+        print(out)
+        print(out_to_reply(out[0]))
