@@ -1,11 +1,15 @@
 # General 3rd party library imports
 import json
+import os
 
 # Specific 3rd party library imports
 from os import listdir
 
 # Local imports
-from utils import convo_reader
+try:
+    from utils import convo_reader
+except ModuleNotFoundError:
+    from clara.utils import convo_reader
 
 # ML specific library imports
 import nltk
@@ -37,12 +41,12 @@ def _load_convos():
     convoFiles = listdir(data['convo_dir'])
     for i in convoFiles:
         if i.endswith('.json'):
-            convoFile = open('convos/' + i)
+            convoFile = open(data['convo_dir'] + i)
             raw_data = convoFile.read()
             convo += json.loads(raw_data)
         elif i.endswith('.convo'):
             # Process the loose file format
-            convoFile = open('convos/' + i)
+            convoFile = open(data['convo_dir'] + i)
             raw_data = convoFile.read()
             convo += convo_reader.convert_to_json(raw_data)
     return convo
@@ -133,7 +137,8 @@ def train_model(model, epochs):
     f.write(json.dumps(train_x))
     f.write('\n')
     f.write(json.dumps(train_y))
-    model.fit(train_x, train_y, n_epoch=epochs, batch_size=10, show_metric=True)
+    model.fit(train_x, train_y, n_epoch=epochs, batch_size=10, show_metric=True)#, callbacks=[cp_callback])
+    model.save('neural_model.h5')
 
 def out_to_reply(out):
     max_i = 0
@@ -148,19 +153,23 @@ if __name__ == '__main__':
     print("Caching tokens...")
     cache_tokens()
     #load_cache()
-    print("Building model...")
-    model = build_model()
-    print("Training model...")
-    train_model(model, 200)
-    print("Testing model...")
-    tokens = string_to_root_array("What are you up to?")
-    out = list(model.predict([tokens]))
-    print(out)
-    print(out_to_reply(out[0]))
-    tokens = string_to_root_array("What is the convo file type?")
-    out = list(model.predict([tokens]))
-    print(out)
-    print(out_to_reply(out[0]))
+    choice = input("train model? [y/n] ")
+    if choice[0] == 'y':
+        print("Building model...")
+        model = build_model()
+        print("Training model...")
+        train_model(model, 200)
+        print("Testing model...")
+        tokens = string_to_root_array("What are you up to?")
+        out = list(model.predict([tokens]))
+        print(out)
+        print(out_to_reply(out[0]))
+        tokens = string_to_root_array("What is the convo file type?")
+        out = list(model.predict([tokens]))
+        print(out)
+        print(out_to_reply(out[0]))
+    else:
+        model = tf.keras.models.load_model('neural_model.h5')
     print("Ready for input...")
     while True:
         text = input("> ")
