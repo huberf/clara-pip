@@ -20,6 +20,7 @@ stemmer = LancasterStemmer()
 import numpy as np
 import tflearn
 import tensorflow as tf
+from tensorflow.python.saved_model import tag_constants
 import random
 
 # Config load
@@ -147,7 +148,9 @@ def out_to_reply(out):
         if out[i] > max_val:
             max_val = out[i]
             max_i = i
-    return list(ROOT_CACHE['replies'].keys())[max_i]
+    reply = list(ROOT_CACHE['replies'].keys())[max_i]
+    reply_val = json.loads(reply)
+    return reply_val
 
 if __name__ == '__main__':
     print("Caching tokens...")
@@ -176,4 +179,4 @@ if __name__ == '__main__':
         tokens = string_to_root_array(text)
         out = list(model.predict([tokens]))
         print(out)
-        print(out_to_reply(out[0]))
+        print(out_to_reply(out[0])[0]['text']) # Simply print first reply
