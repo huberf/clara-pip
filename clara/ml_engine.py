@@ -30,10 +30,13 @@ data = json.loads(raw_data)
 
 ROOT_CACHE = None
 
+def strip_punctuations(val):
+    return val.strip('.').strip('?').strip('!')
+
 def tokenize(string):
     ignore_words = []
     words = string.split(' ')
-    words = [stemmer.stem(w.lower().strip('.').strip('?').strip('!')) for w in words if w not in ignore_words]
+    words = [stemmer.stem(strip_punctuation(w.lower())) for w in words if w not in ignore_words]
     return words
 
 def _load_convos():
@@ -119,8 +122,8 @@ def build_model():
     return model
 
 def train_model(model, epochs):
-    train_x = [] # TODO: Setup examples
-    train_y = [] # TODO: Setup examples
+    train_x = []
+    train_y = []
     convo = _load_convos()
     for i in convo:
         reply_match = json.dumps(i['replies']) # Make JSON representations of replies
@@ -139,7 +142,7 @@ def train_model(model, epochs):
     f.write('\n')
     f.write(json.dumps(train_y))
     model.fit(train_x, train_y, n_epoch=epochs, batch_size=10, show_metric=True)#, callbacks=[cp_callback])
-    model.save('neural_model.h5')
+    model.save('neural_model')
 
 def out_to_reply(out):
     max_i = 0
@@ -172,7 +175,10 @@ if __name__ == '__main__':
         print(out)
         print(out_to_reply(out[0]))
     else:
-        model = tf.keras.models.load_model('neural_model.h5')
+        #model = tf.keras.models.load_model('neural_model')
+        with tf.Session() as sess:
+            new_saver = tf.train.import_meta_graph('neural_model.meta')
+            new_saver.restore(sess, tf.train.latest_checkpoint('./'))
     print("Ready for input...")
     while True:
         text = input("> ")
