@@ -27,14 +27,17 @@ def parse_request(session_id=None):
         message = request.form['input']
     print('User message: ' + message)
     message = message.lower()
+    messageQueue.put({ 'text': message, 'session': session_id })
+    '''
     if session_id == None:
-        messageQueue.put(message)
+        messageQueue.put({ 'text': message, 'session': session_id })
     else:
         try:
             sessionMessages[session_id].put(message)
         except:
             sessionMessages[session_id] = queue.Queue()
             sessionMessages[session_id].put(message)
+    '''
     return json.dumps({ 'success': True })
 
 @app.route("/getresponse", methods=['GET'])
