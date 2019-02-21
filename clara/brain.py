@@ -10,6 +10,7 @@ from datetime import datetime
 import re
 # Import interface for basic convo file
 from .utils import convo_reader
+from .utils import story_reader
 from .message_statistics import MessageStats
 from .utils import sentiment
 from .utils import iograb
@@ -176,6 +177,15 @@ def load_convos():
                 del convo_json[i]['starters'][q - iters]
                 iters += 1
         convo += convo_json
+    # Now load story convos
+    try:
+        storyFiles = listdir('stories/')
+        for i in storyFiles:
+            if i.endswith('.json'):
+                convo_json = story_reader.load_story(i)
+            convo += convo_json
+    except:
+        pass
     build_registry()
 
 load_convos()

@@ -7,7 +7,7 @@
       "response": "The house suddenly shudders and creaks as a wind gust buffets against it. The windows shatter as hail begins to fall. (outside,basement)",
       "next": [
         { "starters": ["outside"],
-          "response": "You get struck by hail and die."
+          "response": "You get struck by hail and die.",
           "id": "hail-death"
         },
         { "starters": ["basement"],
