@@ -14,10 +14,13 @@ def recursive_build(json_cont, parent_id):
     this_id = str(uuid.uuid1())
     this_convo['starters'] = json_cont['starters']
     try:
-        if this_convo['target']:
+        if json_cont['target']:
             this_convo['replies'] = []
-            for i in STORY_INDEX[this_convo['target']]['replies']:
-                this_convo += [this_convo[0]] # FORCE FAILURE
+            for i in STORY_INDEX[json_cont['target']]['replies']:
+                this_convo['replies'] += [{'text': i['text'],
+                    'context': [{'name': this_id, 'starting': True},{'name': parent_id, 'starting': False} if not parent_id == None else {'name': this_id, 'starting': True}]
+                    }]
+                #this_convo += [this_convo[0]] # FORCE FAILURE
     except:
         this_convo['replies'] = [{
             'text': json_cont['response'],
