@@ -21,6 +21,7 @@ def recursive_build(json_cont, parent_id):
                     'context': [{'name': this_id, 'starting': True},{'name': parent_id, 'starting': False} if not parent_id == None else {'name': this_id, 'starting': True}]
                     }]
                 #this_convo += [this_convo[0]] # FORCE FAILURE
+            to_return += [this_convo]
     except:
         this_convo['replies'] = [{
             'text': json_cont['response'],
