@@ -3,6 +3,50 @@ import uuid
 
 STORY_INDEX = {}
 
+def space_indenting(lines):
+    indents = 0
+    for i in lines:
+        if len(i) > 0:
+            if i[0] == '\t':
+                indents = 0
+                break
+            if i[0] == ' ':
+                for j in i:
+                    if j == ' ':
+                        indents += 1
+                    else:
+                        break
+    return indents
+
+def indents_in(line, indents):
+    head_count = 0
+    for i in line:
+        if indents == 0:
+            if i == '\t':
+                head_count += 1
+            else:
+                break
+        else:
+            if indents == ' ':
+                head_count += 1
+            else:
+                break
+    if indents == 0:
+        return head_count
+    else:
+        return int(head_count/indents)
+
+def load_storyfile(file_name):
+    lines = open(file_name).read().split('\n')
+    indents = space_indenting(lines)
+    json_cont = recursive_story_to_json(lines, indents)
+    convos = recursive_build(json_cont, None)
+    return convos
+
+
+def recursive_story_to_json(lines, indents):
+    return {}
+
 def load_story(file_name):
     contents = json.loads(open(file_name).read())
     convos = recursive_build(contents, None)
