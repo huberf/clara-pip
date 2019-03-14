@@ -36,15 +36,33 @@ def indents_in(line, indents):
     else:
         return int(head_count/indents)
 
+def break_to_groups(lines):
+    groups = []
+    last = []
+    for i in lines:
+        for j in i:
+            if not j == '\t' and not j == ' ':
+                if j == 'Q':
+                    groups += [last]
+                    last = []
+                break
+        last += [i]
+    return [1:]
+
 def load_storyfile(file_name):
     lines = open(file_name).read().split('\n')
     indents = space_indenting(lines)
-    json_cont = recursive_story_to_json(lines, indents)
+    groups = break_to_groups(lines)
+    json_cont = recursive_story_to_json(groups, indents)
     convos = recursive_build(json_cont, None)
     return convos
 
 
-def recursive_story_to_json(lines, indents):
+def recursive_story_to_json(groups, indents):
+    if len(groups) == 0:
+        return []
+    top_indent = indents_in(groups[0][0])
+    # Add processing of groups
     return {}
 
 def load_story(file_name):
