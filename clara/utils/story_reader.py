@@ -62,8 +62,21 @@ def recursive_story_to_json(groups, indents):
     if len(groups) == 0:
         return []
     top_indent = indents_in(groups[0][0])
+    convos = []
+    last_convo = {}
+    sub_groupings = []
     # Add processing of groups
-    return {}
+    for i,val in enumerate(groups):
+        if curr_indent(val[0]) == top_indent:
+            last_convo['next'] = recursive_story_to_json(sub_groupings, indents)
+            convos += [last_convo]
+            last_convo = {}
+            sub_groupings = []
+            last_convo = { 'starters': val[0][2:].split(';'),
+                            'response': val[1][2:] }
+        else:
+            sub_groupings += [val]
+    return convos
 
 def load_story(file_name):
     contents = json.loads(open(file_name).read())
