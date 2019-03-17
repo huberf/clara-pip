@@ -4,19 +4,19 @@
   "next": [
     {
       "starters": ["in"],
-      "response": "The house suddenly shudders and creaks as a wind gust buffets against it. The windows shatter as hail begins to fall. (outside,basement)",
+      "response": "The house suddenly shudders and creaks as a wind gust buffets against it. The windows shatter as hail begins to fall. (outside,to basement)",
       "next": [
         { "starters": ["outside"],
           "response": "You get struck by hail and die.",
           "id": "hail-death"
         },
-        { "starters": ["basement"],
-          "response": "You creep downstairs as the musty odors of the basement waft up. (open basement, go back upstairs)",
+        { "starters": ["to basement"],
+          "response": "You creep downstairs as the musty odors of the basement waft up. (open cellar, go back upstairs)",
           "next": [
-            { "starters": "open basement",
+            { "starters": ["open cellar"],
               "response": "A ghoul leaps forward. You die."
             },
-            { "starters": "go back upstairs",
+            { "starters": ["go back upstairs"],
               "response": "It was all an illusion. You win!"
             }
           ]
