@@ -49,6 +49,22 @@ def break_to_groups(lines):
         last += [i]
     return [1:]
 
+def break_groups(groups):
+    if len(groups) == 0:
+        return []
+    top_indent = indents_in(groups[0][0])
+    branches = []
+    building_branch = []
+    for i in groups:
+        if indents_in(i[0]) == top_indent: # New branch start
+            branches += [building_branches]
+            building_branches[0] = i
+            building_branches[1] = []
+        else:
+            building_branches[1] += [i]
+    branches = branches[1:] # First item is dud
+    return branches
+
 def load_storyfile(file_name):
     lines = open(file_name).read().split('\n')
     indents = space_indenting(lines)
@@ -63,6 +79,11 @@ def recursive_story_to_json(groups, indents):
         return []
     top_indent = indents_in(groups[0][0])
     convos = []
+    branches = break_groups(groups)
+    for i in branches:
+        root = i[0]
+        children = recursive_story_to_json(i[1], indents)
+    '''
     last_convo = {}
     sub_groupings = []
     # Add processing of groups
@@ -76,6 +97,7 @@ def recursive_story_to_json(groups, indents):
                             'response': val[1][2:] }
         else:
             sub_groupings += [val]
+    '''
     return convos
 
 def load_story(file_name):
