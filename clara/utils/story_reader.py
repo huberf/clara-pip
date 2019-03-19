@@ -47,21 +47,22 @@ def break_to_groups(lines):
                     last = []
                 break
         last += [i]
-    return [1:]
+    return groups[1:]
 
-def break_groups(groups):
+def break_groups(groups, indents):
     if len(groups) == 0:
         return []
-    top_indent = indents_in(groups[0][0])
+    top_indent = indents_in(groups[0][0], indents)
     branches = []
     building_branch = []
     for i in groups:
-        if indents_in(i[0]) == top_indent: # New branch start
-            branches += [building_branches]
-            building_branches[0] = i
-            building_branches[1] = []
+        if indents_in(i[0], indents) == top_indent: # New branch start
+            branches += [building_branch]
+            building_branch = [None, None]
+            building_branch[0] = i
+            building_branch[1] = []
         else:
-            building_branches[1] += [i]
+            building_branch[1] += [i]
     branches = branches[1:] # First item is dud
     return branches
 
@@ -70,16 +71,19 @@ def load_storyfile(file_name):
     indents = space_indenting(lines)
     groups = break_to_groups(lines)
     json_cont = recursive_story_to_json(groups, indents)
-    convos = recursive_build(json_cont, None)
+    if len(json_cont) > 0:
+        convos = recursive_build(json_cont[0], None) # Stories always have a root start
+    else:
+        convos = []
     return convos
 
 
 def recursive_story_to_json(groups, indents):
     if len(groups) == 0:
         return []
-    top_indent = indents_in(groups[0][0])
+    top_indent = indents_in(groups[0][0], indents)
     convos = []
-    branches = break_groups(groups)
+    branches = break_groups(groups, indents)
     for i in branches:
         root = i[0]
         children = recursive_story_to_json(i[1], indents)
