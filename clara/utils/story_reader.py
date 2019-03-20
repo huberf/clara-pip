@@ -78,6 +78,31 @@ def load_storyfile(file_name):
     return convos
 
 
+def convo_from_raw_lines(lines, formatted_next):
+    new_convo = {}
+    # Get starters
+    for i in lines:
+        if i[0:2] == 'Q:':
+            new_convo['starters'] = i[3:].split(';')
+            break
+    # Try to get replies
+    found_reply = False
+    for i in lines:
+        if i[0:2] == 'R:':
+            new_convo['response'] = i[3:]
+            found_reply = True
+            break
+    if not found_reply:
+        for i in lines:
+            if i[0:7] == 'TARGET:':
+                new_convo['target'] = i[8:]
+    # Add ID if exists
+    for i in lines:
+        if i[0:3] == 'ID:':
+            new_convo['id'] = i[4:]
+    new_convo['next'] = formatted_next
+    return new_convo
+
 def recursive_story_to_json(groups, indents):
     if len(groups) == 0:
         return []
@@ -87,6 +112,9 @@ def recursive_story_to_json(groups, indents):
     for i in branches:
         root = i[0]
         children = recursive_story_to_json(i[1], indents)
+        new_convo = convo_from_raw_lines(root, children)
+        convos += [new_convo]
+
     '''
     last_convo = {}
     sub_groupings = []
