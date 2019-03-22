@@ -84,30 +84,28 @@ def convo_from_raw_lines(lines, formatted_next):
     new_convo = {}
     # Get starters
     for i in lines:
-        if i[0:2] == 'Q:':
-            new_convo['starters'] = i[3:].split(';')
+        if i.strip(' ')[0:2] == 'Q:':
+            new_convo['starters'] = i.strip(' ')[3:].split(';')
             break
     # Try to get replies
     found_reply = False
     for i in lines:
-        if i[0:2] == 'R:':
-            new_convo['response'] = i[3:]
+        if i.strip(' ')[0:2] == 'R:':
+            new_convo['response'] = i.strip(' ')[3:]
             found_reply = True
             break
     if not found_reply:
         for i in lines:
-            if i[0:7] == 'TARGET:':
-                new_convo['target'] = i[8:]
+            if i.strip(' ')[0:7] == 'TARGET:':
+                new_convo['target'] = i.strip(' ')[8:]
     # Add ID if exists
     for i in lines:
-        if i[0:3] == 'ID:':
-            new_convo['id'] = i[4:]
+        if i.strip(' ')[0:3] == 'ID:':
+            new_convo['id'] = i.strip(' ')[4:]
     new_convo['next'] = formatted_next
     return new_convo
 
 def recursive_story_to_json(groups, indents):
-    print('Recursing')
-    print(groups)
     if len(groups) == 0:
         return []
     top_indent = indents_in(groups[0][0], indents)
