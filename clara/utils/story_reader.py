@@ -16,6 +16,7 @@ def space_indenting(lines):
                         indents += 1
                     else:
                         break
+                break
     return indents
 
 def indents_in(line, indents):
@@ -27,7 +28,7 @@ def indents_in(line, indents):
             else:
                 break
         else:
-            if indents == ' ':
+            if i == ' ':
                 head_count += 1
             else:
                 break
@@ -49,7 +50,7 @@ def break_to_groups(lines):
         last += [i]
     return groups[1:]
 
-def break_groups(groups, indents):
+def groups_to_children(groups, indents):
     if len(groups) == 0:
         return []
     top_indent = indents_in(groups[0][0], indents)
@@ -63,6 +64,7 @@ def break_groups(groups, indents):
             building_branch[1] = []
         else:
             building_branch[1] += [i]
+    branches += [building_branch] # Add last branch
     branches = branches[1:] # First item is dud
     return branches
 
@@ -104,11 +106,13 @@ def convo_from_raw_lines(lines, formatted_next):
     return new_convo
 
 def recursive_story_to_json(groups, indents):
+    print('Recursing')
+    print(groups)
     if len(groups) == 0:
         return []
     top_indent = indents_in(groups[0][0], indents)
     convos = []
-    branches = break_groups(groups, indents)
+    branches = groups_to_children(groups, indents)
     for i in branches:
         root = i[0]
         children = recursive_story_to_json(i[1], indents)
