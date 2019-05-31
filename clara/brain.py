@@ -183,6 +183,8 @@ def load_convos():
         for i in storyFiles:
             if i.endswith('.json'):
                 convo_json = story_reader.load_story('stories/' + i)
+            elif i.endswith('.story'):
+                convo_json = story_reader.load_storyfile('stories/' + i)
             convo += convo_json
     except:
         pass

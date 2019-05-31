@@ -102,6 +102,15 @@ def convo_from_raw_lines(lines, formatted_next):
     for i in lines:
         if i.strip(' ')[0:3] == 'ID:':
             new_convo['id'] = i.strip(' ')[4:]
+    # Now check if autoresponse addition is activated
+    for i in lines:
+        if i.strip(' ')[0:12] == 'SHOWRESPONSE':
+            suffix = '('
+            for i in formatted_next:
+                suffix += i['starters'][0] + ', '
+            suffix = suffix[:-2]
+            suffix += ')'
+            new_convo['response'] += ' ' + suffix
     new_convo['next'] = formatted_next
     return new_convo
 
