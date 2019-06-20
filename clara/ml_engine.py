@@ -1,6 +1,7 @@
 # General 3rd party library imports
 import json
 import os
+import pickle
 
 # Specific 3rd party library imports
 from os import listdir
@@ -30,7 +31,7 @@ data = json.loads(raw_data)
 
 ROOT_CACHE = None
 
-def strip_punctuations(val):
+def strip_punctuation(val):
     return val.strip('.').strip('?').strip('!')
 
 def tokenize(string):
@@ -106,7 +107,7 @@ def string_to_root_array(string):
             print("Root is not in collection:", i)
     return to_return
 
-def build_model():
+def build_model(rnn=False):
     # reset underlying graph data
     tf.reset_default_graph()
     # Build neural network
@@ -118,7 +119,10 @@ def build_model():
     net = tflearn.regression(net)
 
     # Define model and setup tensorboard
-    model = tflearn.DNN(net, tensorboard_dir='tflearn_logs')
+    if rnn:
+        tflearn.layers.recurrent.simple_rnn(net)
+    else:
+        model = tflearn.DNN(net, tensorboard_dir='tflearn_logs')
     return model
 
 def train_model(model, epochs):
@@ -143,6 +147,18 @@ def train_model(model, epochs):
     f.write(json.dumps(train_y))
     model.fit(train_x, train_y, n_epoch=epochs, batch_size=10, show_metric=True)#, callbacks=[cp_callback])
     model.save('neural_model')
+    save_model(model)
+
+def save_model(model):
+    # TODO: Add support
+    return
+
+def load_model():
+    # TODO: Add support
+    #with tf.Session() as sess:
+    #    new_saver = tf.train.import_meta_graph('neural_model.meta')
+    #    new_saver.restore(sess, tf.train.latest_checkpoint('./'))
+    return
 
 def out_to_reply(out):
     max_i = 0
@@ -176,9 +192,7 @@ if __name__ == '__main__':
         print(out_to_reply(out[0]))
     else:
         #model = tf.keras.models.load_model('neural_model')
-        with tf.Session() as sess:
-            new_saver = tf.train.import_meta_graph('neural_model.meta')
-            new_saver.restore(sess, tf.train.latest_checkpoint('./'))
+        model = load_model()
     print("Ready for input...")
     while True:
         text = input("> ")
