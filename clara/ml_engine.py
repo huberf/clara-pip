@@ -19,9 +19,9 @@ stemmer = LancasterStemmer()
 
 # things we need for Tensorflow
 import numpy as np
-import tflearn
-import tensorflow as tf
-from tensorflow.python.saved_model import tag_constants
+import keras
+from keras import Sequential
+from keras.layers import Flatten, Embedding, Dense
 import random
 
 # Config load
@@ -108,21 +108,16 @@ def string_to_root_array(string):
     return to_return
 
 def build_model(rnn=False):
-    # reset underlying graph data
-    tf.reset_default_graph()
     # Build neural network
-    net = tflearn.input_data(shape=[None, len(list(ROOT_CACHE['roots'].keys()))])
-    node_count = 16
-    net = tflearn.fully_connected(net, node_count) # First hidden layer
-    net = tflearn.fully_connected(net, node_count) # Second hidden layer
-    net = tflearn.fully_connected(net, len(list(ROOT_CACHE['replies'].keys())), activation='softmax')
-    net = tflearn.regression(net)
-
-    # Define model and setup tensorboard
     if rnn:
-        tflearn.layers.recurrent.simple_rnn(net)
-    else:
-        model = tflearn.DNN(net, tensorboard_dir='tflearn_logs')
+        print('RNN NOT SUPPORTED YET')
+        return None
+    model = Sequential()
+    model.add(Dense(len(list(ROOT_CACHE['roots'].keys())), activation='relu'))
+    model.add(Dense(100, activation='relu'))
+    model.add(Dense(10, activation='relu'))
+    model.add(Dense(len(list(ROOT_CACHE['replies'].keys())), activation='softmax'))
+    model.compile(keras.optimizers.Adam(lr=0.01), loss='categorical_crossentropy')
     return model
 
 def train_model(model, epochs):
@@ -132,7 +127,7 @@ def train_model(model, epochs):
     for i in convo:
         reply_match = json.dumps(i['replies']) # Make JSON representations of replies
         for j in i['starters']:
-            train_x += [ string_to_root_array(j) ] # Convert to model input
+            train_x += [ np.array(string_to_root_array(j)) ] # Convert to model input
             y_in = []
             # Convert to reply to vector with only applicable reply equal to 1
             for q in range(len(list(ROOT_CACHE['replies'].keys()))):
@@ -140,25 +135,27 @@ def train_model(model, epochs):
                     y_in += [1]
                 else:
                     y_in += [0]
-            train_y += [ y_in ]
+            train_y += [ np.array(y_in) ]
+    '''
     f = open('dev_logs/train.log', 'w')
     f.write(json.dumps(train_x))
     f.write('\n')
     f.write(json.dumps(train_y))
-    model.fit(train_x, train_y, n_epoch=epochs, batch_size=10, show_metric=True)#, callbacks=[cp_callback])
-    model.save('neural_model')
+    '''
+    train_x = np.array(train_x) # Make Keras compatible
+    train_y = np.array(train_y) # Make Keras compatible
+    model.fit(train_x, train_y, epochs=epochs, batch_size=10)#, callbacks=[cp_callback])
     save_model(model)
 
 def save_model(model):
-    # TODO: Add support
-    return
+    model.save('neural_model')
 
 def load_model():
     # TODO: Add support
     #with tf.Session() as sess:
     #    new_saver = tf.train.import_meta_graph('neural_model.meta')
     #    new_saver.restore(sess, tf.train.latest_checkpoint('./'))
-    return
+    return keras.models.load_model('neural_model')
 
 def out_to_reply(out):
     max_i = 0
@@ -183,11 +180,11 @@ if __name__ == '__main__':
         train_model(model, 200)
         print("Testing model...")
         tokens = string_to_root_array("What are you up to?")
-        out = list(model.predict([tokens]))
+        out = list(model.predict(np.array([tokens])))
         print(out)
         print(out_to_reply(out[0]))
         tokens = string_to_root_array("What is the convo file type?")
-        out = list(model.predict([tokens]))
+        out = list(model.predict(np.array([tokens])))
         print(out)
         print(out_to_reply(out[0]))
     else:
@@ -197,6 +194,6 @@ if __name__ == '__main__':
     while True:
         text = input("> ")
         tokens = string_to_root_array(text)
-        out = list(model.predict([tokens]))
+        out = list(model.predict(np.array([tokens])))
         print(out)
         print(out_to_reply(out[0])[0]['text']) # Simply print first reply
