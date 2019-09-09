@@ -81,30 +81,31 @@ def load_storyfile(file_name):
 
 
 def convo_from_raw_lines(lines, formatted_next):
+    remove_indent = i.strip(' ')
     new_convo = {}
     # Get starters
     for i in lines:
-        if i.strip(' ')[0:2] == 'Q:':
-            new_convo['starters'] = i.strip(' ')[3:].split(';')
+        if remove_indent[0:2] == 'Q:':
+            new_convo['starters'] = remove_indent[3:].split(';')
             break
     # Try to get replies
     found_reply = False
     for i in lines:
-        if i.strip(' ')[0:2] == 'R:':
-            new_convo['response'] = i.strip(' ')[3:]
+        if remove_indent[0:2] == 'R:':
+            new_convo['response'] = remove_indent[3:]
             found_reply = True
             break
     if not found_reply:
         for i in lines:
-            if i.strip(' ')[0:7] == 'TARGET:':
-                new_convo['target'] = i.strip(' ')[8:]
+            if remove_indent[0:7] == 'TARGET:':
+                new_convo['target'] = remove_indent[8:]
     # Add ID if exists
     for i in lines:
-        if i.strip(' ')[0:3] == 'ID:':
-            new_convo['id'] = i.strip(' ')[4:]
+        if remove_indent[0:3] == 'ID:':
+            new_convo['id'] = remove_indent[4:]
     # Now check if autoresponse addition is activated
     for i in lines:
-        if i.strip(' ')[0:12] == 'SHOWRESPONSE':
+        if remove_indent[0:12] == 'SHOWRESPONSE':
             suffix = '('
             for i in formatted_next:
                 suffix += i['starters'][0] + ', '
