@@ -80,38 +80,35 @@ def load_storyfile(file_name):
     return convos
 
 
-def convo_from_raw_lines(lines, formatted_next):
-    remove_indent = i.strip(' ')
+def convo_from_raw_lines(lines, formatted_next, parent=None, showresponse=False):
     new_convo = {}
-    # Get starters
+    found_reply = False
     for i in lines:
+        remove_indent = i.strip(' ')
+        # Get starters
         if remove_indent[0:2] == 'Q:':
             new_convo['starters'] = remove_indent[3:].split(';')
             break
-    # Try to get replies
-    found_reply = False
-    for i in lines:
+        # Try to get replies
         if remove_indent[0:2] == 'R:':
             new_convo['response'] = remove_indent[3:]
             found_reply = True
             break
-    if not found_reply:
-        for i in lines:
-            if remove_indent[0:7] == 'TARGET:':
-                new_convo['target'] = remove_indent[8:]
-    # Add ID if exists
-    for i in lines:
+        if remove_indent[0:7] == 'TARGET:':
+            new_convo['target'] = remove_indent[8:]
+        # Add ID if exists
         if remove_indent[0:3] == 'ID:':
             new_convo['id'] = remove_indent[4:]
-    # Now check if autoresponse addition is activated
-    for i in lines:
-        if remove_indent[0:12] == 'SHOWRESPONSE':
+        # Now check if autoresponse addition is activated
+        if showresponse or remove_indent[0:12] == 'SHOWRESPONSE':
             suffix = '('
             for i in formatted_next:
                 suffix += i['starters'][0] + ', '
             suffix = suffix[:-2]
             suffix += ')'
             new_convo['response'] += ' ' + suffix
+    if found_reply:
+        new_convo['target'] = None
     new_convo['next'] = formatted_next
     return new_convo
 
