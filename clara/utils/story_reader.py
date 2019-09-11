@@ -70,9 +70,19 @@ def groups_to_children(groups, indents):
 
 def load_storyfile(file_name):
     lines = open(file_name).read().split('\n')
+    showresponses = False
+    tick = -1 # will cause default of no line removal
+    # look for header modifiers
+    if lines[0] == 'HEADERSTART':
+        tick = 1
+        while not lines[tick] == 'HEADEREND':
+            if lines[tick] == 'SHOWRESPONSES':
+                showresponses = True
+            tick += 1
+    lines = lines[tick+1:]
     indents = space_indenting(lines)
     groups = break_to_groups(lines)
-    json_cont = recursive_story_to_json(groups, indents)
+    json_cont = recursive_story_to_json(groups, indents, showresponses)
     if len(json_cont) > 0:
         convos = recursive_build(json_cont[0], None) # Stories always have a root start
     else:
@@ -88,31 +98,34 @@ def convo_from_raw_lines(lines, formatted_next, parent=None, showresponse=False)
         # Get starters
         if remove_indent[0:2] == 'Q:':
             new_convo['starters'] = remove_indent[3:].split(';')
-            break
         # Try to get replies
         if remove_indent[0:2] == 'R:':
             new_convo['response'] = remove_indent[3:]
             found_reply = True
-            break
         if remove_indent[0:7] == 'TARGET:':
             new_convo['target'] = remove_indent[8:]
         # Add ID if exists
         if remove_indent[0:3] == 'ID:':
             new_convo['id'] = remove_indent[4:]
         # Now check if autoresponse addition is activated
-        if showresponse or remove_indent[0:12] == 'SHOWRESPONSE':
-            suffix = '('
-            for i in formatted_next:
-                suffix += i['starters'][0] + ', '
-            suffix = suffix[:-2]
-            suffix += ')'
-            new_convo['response'] += ' ' + suffix
+        if remove_indent[0:12] == 'SHOWRESPONSE':
+            showresponse = True
+    if showresponse:
+        suffix = '('
+        for i in formatted_next:
+            suffix += i['starters'][0] + ', '
+        suffix = suffix[:-2]
+        suffix += ')'
+        new_convo['response'] += ' ' + suffix
     if found_reply:
-        new_convo['target'] = None
+        try:
+            del new_convo['target']
+        except:
+            pass
     new_convo['next'] = formatted_next
     return new_convo
 
-def recursive_story_to_json(groups, indents):
+def recursive_story_to_json(groups, indents, showresponses):
     if len(groups) == 0:
         return []
     top_indent = indents_in(groups[0][0], indents)
@@ -120,8 +133,8 @@ def recursive_story_to_json(groups, indents):
     branches = groups_to_children(groups, indents)
     for i in branches:
         root = i[0]
-        children = recursive_story_to_json(i[1], indents)
-        new_convo = convo_from_raw_lines(root, children)
+        children = recursive_story_to_json(i[1], indents, showresponses)
+        new_convo = convo_from_raw_lines(root, children, showresponses)
         convos += [new_convo]
 
     '''
