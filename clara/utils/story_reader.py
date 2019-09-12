@@ -90,7 +90,7 @@ def load_storyfile(file_name):
     return convos
 
 
-def convo_from_raw_lines(lines, formatted_next, parent=None, showresponse=False):
+def convo_from_raw_lines(lines, formatted_next, showresponse=False):
     new_convo = {}
     found_reply = False
     for i in lines:
@@ -111,12 +111,13 @@ def convo_from_raw_lines(lines, formatted_next, parent=None, showresponse=False)
         if remove_indent[0:12] == 'SHOWRESPONSE':
             showresponse = True
     if showresponse:
-        suffix = '('
-        for i in formatted_next:
-            suffix += i['starters'][0] + ', '
-        suffix = suffix[:-2]
-        suffix += ')'
-        new_convo['response'] += ' ' + suffix
+        if len(formatted_next) > 0:
+            suffix = '('
+            for i in formatted_next:
+                suffix += i['starters'][0] + ', '
+            suffix = suffix[:-2]
+            suffix += ')'
+            new_convo['response'] += ' ' + suffix
     if found_reply:
         try:
             del new_convo['target']
