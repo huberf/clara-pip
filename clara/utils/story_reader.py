@@ -83,6 +83,7 @@ def load_storyfile(file_name):
     indents = space_indenting(lines)
     groups = break_to_groups(lines)
     json_cont = recursive_story_to_json(groups, indents, showresponses)
+    contents = clean_parent_ids(json_cont[0])
     if len(json_cont) > 0:
         convos = recursive_build(json_cont[0], None) # Stories always have a root start
     else:
@@ -110,6 +111,10 @@ def convo_from_raw_lines(lines, formatted_next, showresponse=False):
         # Now check if autoresponse addition is activated
         if remove_indent[0:12] == 'SHOWRESPONSE':
             showresponse = True
+        if remove_indent[0:6] == 'PARENT':
+            values = remove_indent.split(' ')
+            num_up = int(values[1])
+            new_convo['id'] = 'PARENT-{0}'.format(num_up)
     if showresponse:
         if len(formatted_next) > 0:
             suffix = '('
@@ -137,7 +142,6 @@ def recursive_story_to_json(groups, indents, showresponses):
         children = recursive_story_to_json(i[1], indents, showresponses)
         new_convo = convo_from_raw_lines(root, children, showresponses)
         convos += [new_convo]
-
     '''
     last_convo = {}
     sub_groupings = []
@@ -157,8 +161,32 @@ def recursive_story_to_json(groups, indents, showresponses):
 
 def load_story(file_name):
     contents = json.loads(open(file_name).read())
+    contents = clean_parent_ids(contents)
     convos = recursive_build(contents, None)
     return convos
+
+def clean_parent_ids(parsed_convos):
+    # Takes PARENT macro and replaces with proper IDs
+    return _recursive_clean_parent_ids([], parsed_convos)
+
+def _recursive_clean_parent_ids(ids, convo_tree):
+    try:
+        if convo_tree['target'][0:6] == 'PARENT':
+            num_up = int(convo_tree['target'][8:])
+            convo_tree['target'] == ids[-num_up]
+    except KeyError:
+        pass
+    my_id = ''
+    try:
+        my_id = convo_tree['id']
+    except KeyError:
+        my_id = str(uuid.uuid1()) # generate an ID
+        convo_tree['id'] = my_id
+    try:
+        for i in convo_tree['next']:
+            _recursive_clean_parent_ids(ids + [my_id], i)
+    except KeyError: # reached end of branch
+        pass
 
 def recursive_build(json_cont, parent_id):
     to_return = []
