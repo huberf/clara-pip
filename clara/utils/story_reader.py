@@ -83,7 +83,7 @@ def load_storyfile(file_name):
     indents = space_indenting(lines)
     groups = break_to_groups(lines)
     json_cont = recursive_story_to_json(groups, indents, showresponses)
-    contents = clean_parent_ids(json_cont[0])
+    clean_parent_ids(json_cont[0])
     if len(json_cont) > 0:
         convos = recursive_build(json_cont[0], None) # Stories always have a root start
     else:
@@ -161,7 +161,7 @@ def recursive_story_to_json(groups, indents, showresponses):
 
 def load_story(file_name):
     contents = json.loads(open(file_name).read())
-    contents = clean_parent_ids(contents)
+    clean_parent_ids(contents)
     convos = recursive_build(contents, None)
     return convos
 
