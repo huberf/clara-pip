@@ -84,7 +84,6 @@ def load_storyfile(file_name):
     groups = break_to_groups(lines)
     json_cont = recursive_story_to_json(groups, indents, showresponses)
     clean_parent_ids(json_cont[0])
-    print(json_cont)
     if len(json_cont) > 0:
         convos = recursive_build(json_cont[0], None) # Stories always have a root start
     else:
@@ -173,8 +172,8 @@ def clean_parent_ids(parsed_convos):
 def _recursive_clean_parent_ids(ids, convo_tree):
     try:
         if convo_tree['target'][0:6] == 'PARENT':
-            num_up = int(convo_tree['target'][8:])
-            convo_tree['target'] == ids[-(1+num_up)]
+            num_up = int(convo_tree['target'][7:])
+            convo_tree['target'] = ids[-(1+num_up)]
     except KeyError:
         pass
     my_id = ''
