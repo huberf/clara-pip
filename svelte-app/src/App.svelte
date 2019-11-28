@@ -10,13 +10,16 @@
   if (localStorage.getItem('userId')) {
     userId = localStorage.getItem('userId')
   }
+  export let userMsg = "";
+  export let messageLog = [];
 
   // Define communication functions
   function sendMessage(event) {
     event.preventDefault();
 
     let url = serverAddr + '/api/v1/send/' + userId
-    axios.post(url, { input: event.message.text } )
+    messageLog.append({ message: userMsg, time: Date.now(), bot: False })
+    axios.post(url, { input: userMsg } )
       .then(response => {
         if (!response.success) {
           console.error(response)
@@ -30,6 +33,7 @@
     axios.get(url)
       .then(response => {
         console.log(response)
+        messageLog.append({ message: response.text, time: Date.now(), bot: False })
       })
       .catch(console.error)
 
@@ -52,10 +56,81 @@
     background-color: grey;
     height: calc(100vh);
   }
+  body {
+    font:12px arial;
+    color: #222;
+    text-align:center;
+    padding:35px; }
+
+  form, p, span {
+    margin:0;
+    padding:0; }
+
+  input { font:12px arial; }
+
+  a {
+    color:#0000FF;
+    text-decoration:none; }
+
+    a:hover { text-decoration:underline; }
+
+  #wrapper, #loginform {
+    margin:0 auto;
+    padding-bottom:25px;
+    background:#EBF4FB;
+    width:504px;
+    border:1px solid #ACD8F0; }
+
+  #loginform { padding-top:18px; }
+
+  #loginform p { margin: 5px; }
+
+  #chatbox {
+    text-align:left;
+    margin:0 auto;
+    margin-bottom:25px;
+    padding:10px;
+    background:#fff;
+    height:270px;
+    width:430px;
+    border:1px solid #ACD8F0;
+    overflow:auto; }
+
+  #usermsg {
+    width:395px;
+    border:1px solid #ACD8F0; }
+
+  #submit { width: 60px; }
+
+  .error { color: #ff0000; }
+
+  #menu { padding:12.5px 25px 12.5px 25px; }
+
+  .welcome { float:left; }
+
+  .logout { float:right; }
+
+  .msgln { margin:0 0 2px 0; }
 </style>
 
 <div class="main-body">
-<input bind:value={serverAddr} />
-<input bind:value={userId} />
-<h1>Hello {userId}!</h1>
+  <input bind:value={serverAddr} />
+  <div id="wrapper">
+    <div id="menu">
+      <p class="welcome">Welcome, <b></b></p>
+      <input bind:value={userId} />
+      <div style="clear:both"></div>
+    </div>
+
+    <div id="chatbox">
+      {#each messageLog as message}
+      <div class='msgln'>{message.date}<b>Self</b>: {message.message}<br></div>
+      {/each}
+    </div>
+
+    <form name="message" action="">
+      <input name="usermsg" type="text" id="usermsg" bind:value={userMsg} size="63" />
+      <input name="submitmsg" type="submit"  id="submitmsg" value="Send" />
+    </form>
+  </div>
 </div>
