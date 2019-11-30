@@ -18,7 +18,7 @@
     event.preventDefault();
 
     let url = serverAddr + '/api/v1/send/' + userId
-    messageLog.append({ message: userMsg, time: Date.now(), bot: False })
+    messageLog.push({ message: userMsg, time: Date.now(), bot: false})
     axios.post(url, { input: userMsg } )
       .then(response => {
         if (!response.success) {
@@ -32,8 +32,10 @@
     let url = serverAddr + '/api/v1/get/' + userId
     axios.get(url)
       .then(response => {
-        console.log(response)
-        messageLog.append({ message: response.text, time: Date.now(), bot: False })
+        console.log(response.data)
+        if (response.data.new == true) {
+          messageLog.push({ message: response.data.message, time: Date.now(), bot: true })
+        }
       })
       .catch(console.error)
 
@@ -128,9 +130,9 @@
       {/each}
     </div>
 
-    <form name="message" action="">
+    <div name="message">
       <input name="usermsg" type="text" id="usermsg" bind:value={userMsg} size="63" />
-      <input name="submitmsg" type="submit"  id="submitmsg" value="Send" />
-    </form>
+      <input name="submitmsg" type="submit" on:click|once={sendMessage}  id="submitmsg" value="Send" />
+    </div>
   </div>
 </div>
