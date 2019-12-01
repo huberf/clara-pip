@@ -19,7 +19,11 @@
 
     let url = serverAddr + '/api/v1/send/' + userId
     messageLog.push({ message: userMsg, time: Date.now(), bot: false})
-    axios.post(url, { input: userMsg } )
+    let config = { headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*' }
+    }
+    axios.post(url, { input: userMsg }, config )
       .then(response => {
         if (!response.success) {
           console.error(response)

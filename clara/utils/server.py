@@ -25,6 +25,9 @@ def parse_request(session_id=None):
     try:
         text = json.dumps(request.json)
         message = request.json('input')
+    except TypeError:
+        text = json.dumps(request.json)
+        message = request.json['input']
     except:
         message = request.form['input']
     print('User message: ' + message)
