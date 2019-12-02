@@ -11,14 +11,15 @@
     userId = localStorage.getItem('userId')
   }
   export let userMsg = "";
-  export let messageLog = [];
+  export let messageLog = { log: [] };
 
   // Define communication functions
   function sendMessage(event) {
     event.preventDefault();
 
     let url = serverAddr + '/api/v1/send/' + userId
-    messageLog.push({ message: userMsg, time: Date.now(), bot: false})
+    messageLog.log.push({ message: userMsg, time: Date.now(), bot: false})
+    messageLog.log = messageLog.log
     let config = { headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*' }
@@ -36,9 +37,9 @@
     let url = serverAddr + '/api/v1/get/' + userId
     axios.get(url)
       .then(response => {
-        console.log(response.data)
-        if (response.data.new == true) {
-          messageLog.push({ message: response.data.message, time: Date.now(), bot: true })
+        if (response.data.new == true || response.data.new == "true") {
+          messageLog.log.push({ message: response.data.message, time: Date.now(), bot: true })
+          messageLog.log = messageLog.log
         }
       })
       .catch(console.error)
@@ -129,14 +130,14 @@
     </div>
 
     <div id="chatbox">
-      {#each messageLog as message}
+      {#each messageLog.log as message}
       <div class='msgln'>{message.date}<b>Self</b>: {message.message}<br></div>
       {/each}
     </div>
 
     <div name="message">
       <input name="usermsg" type="text" id="usermsg" bind:value={userMsg} size="63" />
-      <input name="submitmsg" type="submit" on:click|once={sendMessage}  id="submitmsg" value="Send" />
+      <input name="submitmsg" type="submit" on:click={sendMessage}  id="submitmsg" value="Send" />
     </div>
   </div>
 </div>
