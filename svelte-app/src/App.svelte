@@ -29,8 +29,16 @@
         if (!response.success) {
           console.error(response)
         }
+        userMsg = "" // clear old message
       })
       .catch(console.error)
+  }
+
+  // Setup on enter handling
+  function handleKeyPress(event) {
+    if (event.keyCode == 13) { // enter key pressed
+      sendMessage(event);
+    }
   }
 
   function pollMessages() {
@@ -131,12 +139,20 @@
 
     <div id="chatbox">
       {#each messageLog.log as message}
-      <div class='msgln'>{message.date}<b>Self</b>: {message.message}<br></div>
+      <div class='msgln'>{message.time}
+        <b>
+        {#if message.bot }
+        Clara
+        {:else}
+        Self
+        {/if}
+        </b>: {message.message}<br>
+        </div>
       {/each}
     </div>
 
     <div name="message">
-      <input name="usermsg" type="text" id="usermsg" bind:value={userMsg} size="63" />
+      <input name="usermsg" on:keydown={handleKeyPress} type="text" id="usermsg" bind:value={userMsg} size="63" />
       <input name="submitmsg" type="submit" on:click={sendMessage}  id="submitmsg" value="Send" />
     </div>
   </div>
