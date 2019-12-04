@@ -1,5 +1,6 @@
 <script>
   import axios from 'axios';
+  import { beforeUpdate, afterUpdate } from 'svelte';
   
   // Set up values
   export let serverAddr = "http://localhost:3000";
@@ -12,6 +13,8 @@
   }
   export let userMsg = "";
   export let messageLog = { log: [] };
+
+  let messageDiv;
 
   // Define communication functions
   function sendMessage(event) {
@@ -58,6 +61,10 @@
   }
   // Kick off polling
   pollMessages()
+
+  afterUpdate(() => {
+    messageDiv.scrollTo(0, messageDiv.scrollHeight);
+  });
 </script>
 
 <style>
@@ -137,7 +144,7 @@
       <div style="clear:both"></div>
     </div>
 
-    <div id="chatbox">
+    <div id="chatbox" bind:this={messageDiv}>
       {#each messageLog.log as message}
       <div class='msgln'>{message.time}
         <b>
