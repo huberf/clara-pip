@@ -16,9 +16,17 @@
 
   let messageDiv;
 
+  // Define quick action ability
+  function quickAction(message) {
+    userMsg = message;
+    sendMessage();
+  }
+
   // Define communication functions
   function sendMessage(event) {
-    event.preventDefault();
+    if (event) {
+      event.preventDefault();
+    }
 
     let url = serverAddr + '/api/v1/send/' + userId
     messageLog.log.push({ message: userMsg, time: Date.now(), bot: false})
@@ -44,12 +52,28 @@
     }
   }
 
+  function processMessage(msg) {
+    let split = msg.split('(');
+    let options = [];
+    if (msg[msg.length-1] == ')' && split.length > 1) {
+      let lastBit = split[split.length-1]
+      lastBit = lastBit.slice(0, lastBit.length-1)
+      options = lastBit.split(',')
+    }
+    if (options) {
+      msg = msg.slice(0, msg.lastIndexOf('('))
+    }
+    return { msg, options }
+  }
+
   function pollMessages() {
     let url = serverAddr + '/api/v1/get/' + userId
     axios.get(url)
       .then(response => {
         if (response.data.new == true || response.data.new == "true") {
-          messageLog.log.push({ message: response.data.message, time: Date.now(), bot: true })
+          let processed = processMessage(response.data.message);
+          messageLog.log.push({ message: processed.msg, options: processed.options,
+            time: Date.now(), bot: true })
           messageLog.log = messageLog.log
         }
       })
@@ -154,6 +178,11 @@
         Self
         {/if}
         </b>: {message.message}<br>
+        {#if message.options }
+          {#each message.options as option}
+          <button on:click={quickAction(option)}>{option}</button>
+          {/each}
+        {/if}
         </div>
       {/each}
     </div>
