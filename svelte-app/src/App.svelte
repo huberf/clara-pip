@@ -124,7 +124,6 @@
     margin:0 auto;
     padding-bottom:25px;
     background:#EBF4FB;
-    width:504px;
     border:1px solid #ACD8F0; }
 
   #loginform { padding-top:18px; }
@@ -132,21 +131,23 @@
   #loginform p { margin: 5px; }
 
   #chatbox {
+    height: calc(100vh - 200px);
     text-align:left;
     margin:0 auto;
     margin-bottom:25px;
-    padding:10px;
+    padding: 10px 20px;
     background:#fff;
     height:270px;
-    width:430px;
     border:1px solid #ACD8F0;
     overflow:auto; }
 
   #usermsg {
-    width:395px;
+    width: calc(100% - 50px);
     border:1px solid #ACD8F0; }
 
   #submit { width: 60px; }
+
+  #message { padding: 12.5px 25px 12.5px 25px; }
 
   .error { color: #ff0000; }
 
