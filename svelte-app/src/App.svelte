@@ -5,11 +5,17 @@
   // Set up values
   export let serverAddr = "http://localhost:3000";
   if (localStorage.getItem('serverAddr')) {
-    userId = localStorage.getItem('serverAddr')
+    serverAddr = localStorage.getItem('serverAddr')
+  }
+  function updateServerAddr(event) {
+    localStorage.setItem('serverAddr', serverAddr)
   }
   export let userId = "svelte";
   if (localStorage.getItem('userId')) {
     userId = localStorage.getItem('userId')
+  }
+  function updateUserId(event) {
+    localStorage.setItem('userId', userId)
   }
   export let userMsg = "";
   export let messageLog = { log: [] };
@@ -29,7 +35,7 @@
     }
 
     let url = serverAddr + '/api/v1/send/' + userId
-    messageLog.log.push({ message: userMsg, time: Date.now(), bot: false})
+    messageLog.log.push({ message: userMsg, time: new Date(), bot: false})
     messageLog.log = messageLog.log
     let config = { headers: {
       'Content-Type': 'application/json',
@@ -73,7 +79,7 @@
         if (response.data.new == true || response.data.new == "true") {
           let processed = processMessage(response.data.message);
           messageLog.log.push({ message: processed.msg, options: processed.options,
-            time: Date.now(), bot: true })
+            time: new Date(), bot: true })
           messageLog.log = messageLog.log
         }
       })
@@ -102,11 +108,11 @@
     background-color: grey;
     height: calc(100vh);
   }
-  body {
+  :global(body) {
     font:12px arial;
     color: #222;
-    text-align:center;
-    padding:35px; }
+    padding: 0px !important;
+  }
 
   form, p, span {
     margin:0;
@@ -137,7 +143,6 @@
     margin-bottom:25px;
     padding: 10px 20px;
     background:#fff;
-    height:270px;
     border:1px solid #ACD8F0;
     overflow:auto; }
 
@@ -161,17 +166,17 @@
 </style>
 
 <div class="main-body">
-  <input bind:value={serverAddr} />
+  <span>Server: <input on:keyup={updateServerAddr} bind:value={serverAddr} /></span>
   <div id="wrapper">
     <div id="menu">
       <p class="welcome">Welcome, <b></b></p>
-      <input bind:value={userId} />
+      <input on:keyup={updateUserId} bind:value={userId} />
       <div style="clear:both"></div>
     </div>
 
     <div id="chatbox" bind:this={messageDiv}>
       {#each messageLog.log as message}
-      <div class='msgln'>{message.time}
+      <div class='msgln'>{message.time.toLocaleString()}
         <b>
         {#if message.bot }
         Clara
