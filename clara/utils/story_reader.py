@@ -123,11 +123,8 @@ def convo_from_raw_lines(lines, formatted_next, showresponse=False):
             suffix = suffix[:-2]
             suffix += ')'
             new_convo['response'] += ' ' + suffix
-    if found_reply:
-        try:
-            del new_convo['target']
-        except:
-            pass
+    if found_reply and 'target' in new_convo.keys():
+        del new_convo['target']
     new_convo['next'] = formatted_next
     return new_convo
 
