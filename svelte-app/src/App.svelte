@@ -19,6 +19,20 @@
   }
   export let userMsg = "";
   export let messageLog = { log: [] };
+  if (localStorage.getItem('messageLog')) {
+    messageLog.log = JSON.parse(localStorage.getItem('messageLog'))
+  }
+
+  function displayMessage(msg, time, bot, options) {
+    messageLog.log.push({ message: msg, time, bot, options })
+    messageLog.log = messageLog.log
+    localStorage.setItem('messageLog', JSON.stringify(messageLog.log))
+  }
+
+  function removeHistory() {
+    message.log = []
+    localStorage.setItem('messageLog', null)
+  }
 
   let messageDiv;
 
@@ -35,8 +49,7 @@
     }
 
     let url = serverAddr + '/api/v1/send/' + userId
-    messageLog.log.push({ message: userMsg, time: new Date(), bot: false})
-    messageLog.log = messageLog.log
+    displayMessage(userMsg, new Date(), false)
     let config = { headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*' }
@@ -78,9 +91,7 @@
       .then(response => {
         if (response.data.new == true || response.data.new == "true") {
           let processed = processMessage(response.data.message);
-          messageLog.log.push({ message: processed.msg, options: processed.options,
-            time: new Date(), bot: true })
-          messageLog.log = messageLog.log
+          displayMessage(processed.msg, new Date(), true, processed.options)
         }
       })
       .catch(console.error)
@@ -144,11 +155,13 @@
     padding: 10px 20px;
     background:#fff;
     border:1px solid #ACD8F0;
-    overflow:auto; }
+    overflow:auto;
+    border-radius: 5px; }
 
   #usermsg {
     width: calc(100% - 50px);
-    border:1px solid #ACD8F0; }
+    border:1px solid #ACD8F0;
+    border-radius: 4px; }
 
   #submit { width: 60px; }
 
@@ -158,11 +171,15 @@
 
   #menu { padding:12.5px 25px 12.5px 25px; }
 
-  .welcome { float:left; }
+  .welcome { float:left; padding-top: 4px; }
 
   .logout { float:right; }
 
   .msgln { margin:0 0 2px 0; }
+
+  #useridfield { height: 20px; }
+
+  #submitmsg { padding-top: 2px; }
 </style>
 
 <div class="main-body">
@@ -170,7 +187,7 @@
   <div id="wrapper">
     <div id="menu">
       <p class="welcome">Welcome, <b></b></p>
-      <input on:keyup={updateUserId} bind:value={userId} />
+      <input id="useridfield" on:keyup={updateUserId} bind:value={userId} />
       <div style="clear:both"></div>
     </div>
 
