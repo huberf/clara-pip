@@ -19,8 +19,9 @@
   }
   export let userMsg = "";
   export let messageLog = { log: [] };
-  if (localStorage.getItem('messageLog')) {
-    messageLog.log = JSON.parse(localStorage.getItem('messageLog'))
+  let cachedMessages = localStorage.getItem('messageLog')
+  if (cachedMessages && cachedMessages != 'null'){
+    messageLog.log = JSON.parse(cachedMessages)
   }
 
   function displayMessage(msg, time, bot, options) {
@@ -30,8 +31,8 @@
   }
 
   function removeHistory() {
-    message.log = []
-    localStorage.setItem('messageLog', null)
+    messageLog.log = []
+    localStorage.setItem('messageLog', '')
   }
 
   let messageDiv;
@@ -175,15 +176,53 @@
 
   .logout { float:right; }
 
-  .msgln { margin:0 0 2px 0; }
+  .msgln { margin:0 0 2px 0; position: relative; }
+
+  .msgln { background: lightblue;
+    border-radius: 5px;
+    padding: 5px;
+    width: max-content;
+    clear: both;
+    max-width: 90%; }
+
+  .msgln:after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 5px;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-top-color: lightblue;
+    border-bottom: 0;
+    border-left: 0;
+    margin-left: -2px;
+    margin-bottom: -4px; }
+
+  .msgself { float: right; }
+
+  .msgself:after {
+    left: calc(100% - 10px);
+    border-right: 0 !important;
+    border-left: 10px solid transparent !important;
+  }
 
   #useridfield { height: 20px; }
 
   #submitmsg { padding-top: 2px; }
+
+  .msgtime { font-size: 10px; }
+
+  #historyclear { float: right; }
+
+  #topcontrol { padding: 5px 5px 0px 5px; }
 </style>
 
 <div class="main-body">
-  <span>Server: <input on:keyup={updateServerAddr} bind:value={serverAddr} /></span>
+  <div id="topcontrol">
+    <span>Server: <input on:keyup={updateServerAddr} bind:value={serverAddr} /></span>
+    <button id="historyclear" on:click={removeHistory}>Clear</button>
+  </div>
   <div id="wrapper">
     <div id="menu">
       <p class="welcome">Welcome, <b></b></p>
@@ -193,7 +232,7 @@
 
     <div id="chatbox" bind:this={messageDiv}>
       {#each messageLog.log as message}
-      <div class='msgln'>{message.time.toLocaleString()}
+      <div class='msgln {!message.bot ? 'msgself' : ''}'>
         <b>
         {#if message.bot }
         Clara
@@ -206,6 +245,7 @@
           <button on:click={quickAction(option)}>{option}</button>
           {/each}
         {/if}
+        <div class="msgtime">{message.time.toLocaleString()}</div>
         </div>
       {/each}
     </div>
